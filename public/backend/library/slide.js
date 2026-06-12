@@ -48,6 +48,7 @@
                             <img src="${image}" alt="">
                             <input type="hidden" name="slide[image][]" value="${image}">
                             <span class="deleteSlide btn btn-danger"><i class="fa fa-trash"></i></span>
+                            <span class="select-image">Chọn Ảnh</span>
                         </span>
                     </div>
                     <div class="col-lg-9">

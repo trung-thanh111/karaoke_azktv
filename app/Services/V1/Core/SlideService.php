@@ -97,15 +97,17 @@ class SlideService extends BaseService
     private function handleSlideItem($request, $languageId){
         $slide = $request->input('slide');
         $temp = [];
-        foreach($slide['image'] as $key => $val){
-            $temp[$languageId][] = [
-                'image' => $val,
-                'name' => $slide['name'][$key],
-                'description' => $slide['description'][$key],
-                'canonical' => $slide['canonical'][$key],
-                'alt' => $slide['alt'][$key],
-                'window' => (isset($slide['window'][$key])) ? $slide['window'][$key] : '',
-            ];
+        if (isset($slide['image']) && is_array($slide['image'])) {
+            foreach($slide['image'] as $key => $val){
+                $temp[$languageId][] = [
+                    'image' => $val,
+                    'name' => $slide['name'][$key] ?? '',
+                    'description' => $slide['description'][$key] ?? '',
+                    'canonical' => $slide['canonical'][$key] ?? '',
+                    'alt' => $slide['alt'][$key] ?? '',
+                    'window' => (isset($slide['window'][$key])) ? $slide['window'][$key] : '',
+                ];
+            }
         }
         return $temp;
     }
@@ -121,7 +123,9 @@ class SlideService extends BaseService
         $slideItem = $slide->item;
         unset($slideItem[$language]);
 
-        $payload['item'][$language] = $temp + $slideItem;
+        $payload['item'] = [
+            $language => $temp
+        ] + $slideItem;
         $slide = $this->slideRepository->update($slideId, $payload);
     }
   
@@ -131,7 +135,7 @@ class SlideService extends BaseService
         $fields = ['image', 'description', 'window','canonical','name','alt'];
         foreach($slide as $key => $val){
             foreach($fields as $field){
-                $temp[$field][] = $val[$field];
+                $temp[$field][] = $val[$field] ?? '';
             }
         }
         return $temp;
@@ -153,7 +157,7 @@ class SlideService extends BaseService
         foreach($slides as $key => $val){
             $temp[$val->keyword]['name'] = $val->name;
             $temp[$val->keyword]['short_code'] = $val->short_code;
-            $temp[$val->keyword]['item'] = $val->item[$language];
+            $temp[$val->keyword]['item'] = $val->item[$language] ?? [];
             $temp[$val->keyword]['setting'] = $val->setting;
         }
         return $temp;

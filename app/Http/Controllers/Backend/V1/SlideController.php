@@ -73,7 +73,7 @@ class SlideController extends Controller
     public function edit($id){
         $this->authorize('modules', 'slide.edit');
         $slide = $this->slideRepository->findById($id);
-        $slideItem = $this->slideService->converSlideArray($slide->item[$this->language]);
+        $slideItem = $this->slideService->converSlideArray($slide->item[$this->language] ?? []);
 
 
         $config = $this->config();

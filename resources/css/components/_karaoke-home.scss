@@ -176,8 +176,9 @@ $white: #fff;
 
     &__media {
         position: relative;
-        min-height: 490px;
+        min-height: 580px;
         isolation: isolate;
+        width: 100%;
     }
 
     &__image {
@@ -185,8 +186,6 @@ $white: #fff;
         overflow: visible;
 
         img {
-            position: relative;
-            z-index: 1;
             display: block;
             width: 100%;
             height: 100%;
@@ -208,9 +207,9 @@ $white: #fff;
         &--1 {
             top: 0;
             left: 0;
-            width: min(70%, 430px);
-            aspect-ratio: 1 / 1;
-            z-index: 1;
+            width: 46%;
+            aspect-ratio: 1 / 1.5;
+            z-index: 2;
 
             &:before {
                 top: -20px;
@@ -226,9 +225,9 @@ $white: #fff;
         &--2 {
             right: 0;
             bottom: 0;
-            width: min(72%, 455px);
-            aspect-ratio: 1.13 / 1;
-            z-index: 2;
+            width: 46%;
+            aspect-ratio: 1 / 1.5;
+            z-index: 1;
 
             &:before {
                 display: none;
@@ -428,7 +427,7 @@ $white: #fff;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 28px;
-    width: min(1440px, calc(100vw - 18px));
+    width: 100vw;
     margin-left: 50%;
     transform: translateX(-50%);
 }
@@ -1211,17 +1210,20 @@ $white: #fff;
         &__image {
             &--1,
             &--2 {
-                width: min(82vw, 360px);
-                height: 280px;
-                aspect-ratio: auto;
+                width: 46%;
+                height: auto;
             }
 
             &--1 {
+                top: 0;
                 left: 0;
+                aspect-ratio: 1 / 1.5;
             }
 
             &--2 {
+                bottom: 0;
                 right: 0;
+                aspect-ratio: 1 / 1.5;
             }
         }
 
@@ -1313,26 +1315,46 @@ $white: #fff;
 
     .karaoke-intro {
         &__media {
-            min-height: 430px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            min-height: auto;
         }
 
         &__image {
+            position: relative;
+
             &--1,
             &--2 {
-                height: 230px;
+                width: 100%;
+                max-width: 280px;
+                height: auto;
+                aspect-ratio: 1 / 1.5;
+            }
+
+            &--1 {
+                top: auto;
+                left: auto;
+            }
+
+            &--2 {
+                bottom: auto;
+                right: auto;
             }
 
             &--1:before {
                 width: 54px;
                 height: 54px;
-                top: -18px;
-                right: -18px;
+                left: -12px;
+                bottom: -12px;
             }
 
-            &--2:after {
+            &--2:before {
                 width: 54px;
                 height: 54px;
-                bottom: -20px;
+                right: -12px;
+                top: -12px;
             }
         }
 

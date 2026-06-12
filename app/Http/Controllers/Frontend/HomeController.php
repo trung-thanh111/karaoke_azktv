@@ -46,6 +46,9 @@ class HomeController extends FrontendController
 
         $widgets = $this->widgetService->getWidget([
             ['keyword' => 'intro'],
+            ['keyword' => 'intro-features', 'object' => true],
+            ['keyword' => 'intro-services', 'object' => true],
+            ['keyword' => 'intro-action', 'object' => true],
             ['keyword' => 'home-designs-1', 'object' => true, 'limit' => 30],
             ['keyword' => 'home-designs-2', 'object' => true, 'limit' => 30],
             ['keyword' => 'home-news-1', 'object' => true, 'limit' => 30],

@@ -62,7 +62,7 @@ class WidgetService extends BaseService
         DB::beginTransaction();
         try {
             $payload = $request->only('name', 'keyword', 'short_code', 'description', 'album', 'model', 'note');
-            $payload['model_id'] = $request->input('modelItem.id');
+            $payload['model_id'] = $request->input('modelItem.id', []);
             $payload['description'] = [
                 $languageId => $payload['description']
             ];
@@ -82,7 +82,12 @@ class WidgetService extends BaseService
         DB::beginTransaction();
         try {
             $payload = $request->only('name', 'keyword', 'short_code', 'description', 'album', 'model', 'note');
-            $payload['model_id'] = $request->input('modelItem.id');
+            if ($request->has('modelItem.id')) {
+                $payload['model_id'] = $request->input('modelItem.id', []);
+            } else {
+                $currentWidget = $this->widgetRepository->findById($id);
+                $payload['model_id'] = $currentWidget->model_id ?? [];
+            }
             $payload['description'] = [
                 $languageId => $payload['description']
             ];
@@ -254,7 +259,12 @@ class WidgetService extends BaseService
             ->toArray();
 
         if (empty($modelIds)) {
-            return [];
+            $result = [];
+            foreach ($widgets as $widget) {
+                $widget->object = collect();
+                $result[$widget->keyword] = $widget;
+            }
+            return $result;
         }
 
 
@@ -273,9 +283,19 @@ class WidgetService extends BaseService
             // Handle multiple model_ids
             $widgetModelIds = is_array($widget->model_id) ? $widget->model_id : [$widget->model_id];
 
+            $widgetModelIds = array_values(array_filter($widgetModelIds));
+
+            if (empty($widgetModelIds)) {
+                $widget->object = collect();
+                $result[$widget->keyword] = $widget;
+                continue;
+            }
+
             $cataloguesForWidget = $catalogues->whereIn('id', $widgetModelIds);
 
             if ($cataloguesForWidget->isEmpty()) {
+                $widget->object = collect();
+                $result[$widget->keyword] = $widget;
                 continue;
             }
 
@@ -343,9 +363,20 @@ class WidgetService extends BaseService
         foreach ($widgets as $widget) {
             // Handle multiple model_ids
             $widgetModelIds = is_array($widget->model_id) ? $widget->model_id : [$widget->model_id];
+            
+            $widgetModelIds = array_values(array_filter($widgetModelIds));
+
+            if (empty($widgetModelIds)) {
+                $widget->object = collect();
+                $result[$widget->keyword] = $widget;
+                continue;
+            }
+
             $objectsForWidget = $objects->whereIn('id', $widgetModelIds);
 
             if ($objectsForWidget->isEmpty()) {
+                $widget->object = collect();
+                $result[$widget->keyword] = $widget;
                 continue;
             }
 

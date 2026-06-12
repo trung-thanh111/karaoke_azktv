@@ -28,7 +28,9 @@ class PostRepository extends BaseRepository
 
     public function getPostById(int $id = 0, $language_id = 0){
         $publishColumn = SchemaCache::hasColumn('posts', 'publish') ? 'posts.publish' : 'posts.pubish';
-        $canonicalSelect = SchemaCache::hasColumn('post_language', 'canonical') ? 'tb2.canonical' : DB::raw("'' as canonical");
+        $canonicalSelect = SchemaCache::hasColumn('post_language', 'canonical') 
+            ? 'tb2.canonical' 
+            : DB::raw("(select canonical from routers where routers.module_id = posts.id and routers.controllers like '%PostController%' and routers.language_id = " . (int)$language_id . " limit 1) as canonical");
 
         return $this->model->select([
                 'posts.id',

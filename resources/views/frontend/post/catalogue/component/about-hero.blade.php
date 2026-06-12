@@ -2,16 +2,7 @@
     $languageId = $config['language'] ?? 1;
     $hero = $widgets['about-hero'] ?? null;
     $heroDesc = $hero ? ($hero->description[$languageId] ?? ($hero->description['1'] ?? '')) : '';
-    if (is_string($heroDesc)) {
-        $cleanedDesc = html_entity_decode(strip_tags($heroDesc));
-        $decoded = json_decode($cleanedDesc, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            $heroDesc = $decoded;
-        } else {
-            $heroDesc = $cleanedDesc;
-        }
-    }
-    $heroTitle = is_array($heroDesc) ? ($heroDesc['title'] ?? ($hero->name ?? 'GIỚI THIỆU')) : (!empty($heroDesc) ? $heroDesc : ($hero->name ?? 'GIỚI THIỆU'));
+    $heroTitle = $hero->name ?? '';
     $heroBg = isset($hero->album) && is_array($hero->album) ? ($hero->album[0] ?? '') : '';
 @endphp
 @if($hero)

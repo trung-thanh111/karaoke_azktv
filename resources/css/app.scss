@@ -38,7 +38,7 @@
     --star-color: #ffcd29;
     --hover-color: var(--primary-color);
     --second-font: "Inter", sans-serif;
-    --main-font: "Inter", sans-serif;
+    --main-font: "Montserrat", sans-serif;
 }
 
 // ================
@@ -49,6 +49,17 @@ body {
     font-weight: normal;
     font-size: 14px;
     min-height: 1000px;
+}
+
+h1, h2, h3, h4, h5, h6,
+.title, .heading,
+.karaoke-section-heading h2,
+.karaoke-hero__eyebrow,
+.karaoke-hero__title,
+.col-header,
+.card-title,
+.tab {
+    font-family: var(--main-font) !important;
 }
 
 a {

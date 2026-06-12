@@ -14,16 +14,17 @@
         ['label' => 'Xem các mẫu phòng', 'url' => '#'],
     ];
     $introWidget = $widgets['intro'] ?? null;
-    $introDescription = $introWidget->description[$languageId] ?? ($introWidget->description['1'] ?? []);
+    $introDescription = $introWidget->description[$languageId] ?? ($introWidget->description['1'] ?? '');
     $introImages = $introWidget->album ?? [];
-    $introFeatures = $introDescription['features'] ?? [];
-    $introServices = $introDescription['services'] ?? [];
-    $introAction = $introDescription['action'] ?? [];
+    $introFeatures = collect($widgets['intro-features']->object ?? []);
+    $introServices = collect($widgets['intro-services']->object ?? []);
+    $introAction = collect($widgets['intro-action']->object ?? [])->first();
     $constructionWidget = $widgets['karaoke-construction'] ?? null;
-    $constructionData = $constructionWidget->description[$languageId] ?? ($constructionWidget->description['1'] ?? []);
+    $constructionBg = $constructionWidget->album[0] ?? '';
     $constructionCards = collect($constructionWidget->object ?? []);
     $productWidget = $widgets['featured-products'] ?? null;
-    $productData = $productWidget->description[$languageId] ?? ($productWidget->description['1'] ?? []);
+    $productCardLabel = $productWidget->description[$languageId] ?? ($productWidget->description['1'] ?? '');
+    $productActionLabel = $productWidget->short_code ?? '';
     $productCards = collect($productWidget->object ?? []);
     $designsWidget = $widgets['home-designs'] ?? null;
     $designsData = $designsWidget
@@ -146,53 +147,59 @@
                             @foreach (array_slice($introImages, 0, 2) as $key => $image)
                                 <div class="karaoke-intro__image karaoke-intro__image--{{ $key + 1 }}">
                                     <img src="{{ $image }}"
-                                        alt="{{ $introDescription['title'] ?? ($introWidget->name ?? '') }}"
+                                        alt="{{ $introWidget->name ?? '' }}"
                                         loading="lazy">
                                 </div>
                             @endforeach
                         </div>
                     @endif
                     <div class="karaoke-intro__content">
-                        @if (!empty($introDescription['title']))
-                            <h2>{{ $introDescription['title'] }}</h2>
+                        @if (!empty($introWidget->name))
+                            <h2>{{ $introWidget->name }}</h2>
                         @endif
-                        @if (!empty($introDescription['subtitle']))
-                            <div class="karaoke-intro__subtitle">{{ $introDescription['subtitle'] }}</div>
+                        @if (!empty($introWidget->short_code))
+                            <div class="karaoke-intro__subtitle">{{ $introWidget->short_code }}</div>
                         @endif
-                        @if (!empty($introDescription['body']))
-                            <div class="karaoke-intro__body">{!! nl2br(e($introDescription['body'])) !!}</div>
+                        @if (!empty($introDescription))
+                            <div class="karaoke-intro__body">{!! nl2br(e($introDescription)) !!}</div>
                         @endif
-                        @if (!empty($introFeatures))
+                        @if ($introFeatures->isNotEmpty())
                             <div class="karaoke-intro__features">
                                 @foreach ($introFeatures as $feature)
+                                    @php
+                                        $featureTitle = $feature->short_name ?: $objectName($feature);
+                                    @endphp
                                     <div class="karaoke-intro__feature">
-                                        @if (!empty($feature['icon']))
-                                            <span><i class="{{ $feature['icon'] }}"></i></span>
+                                        @if (!empty($feature->icon))
+                                            <span><i class="{{ $feature->icon }}"></i></span>
                                         @endif
-                                        @if (!empty($feature['label']))
-                                            <strong>{{ $feature['label'] }}</strong>
+                                        @if (!empty($featureTitle))
+                                            <strong>{{ $featureTitle }}</strong>
                                         @endif
                                     </div>
                                 @endforeach
                             </div>
                         @endif
-                        @if (!empty($introAction['label']))
-                            <a class="karaoke-btn karaoke-btn--wide" href="{{ $introAction['url'] ?? '#' }}">
-                                <span>{{ $introAction['label'] }}</span>
+                        @if (!empty($introAction))
+                            <a class="karaoke-btn karaoke-btn--wide" href="{{ $objectUrl($introAction) }}">
+                                <span>{{ $introAction->short_name ?: $objectName($introAction) }}</span>
                                 <i class="fa fa-long-arrow-right"></i>
                             </a>
                         @endif
                     </div>
                 </div>
-                @if (!empty($introServices))
+                @if ($introServices->isNotEmpty())
                     <div class="karaoke-intro__services">
                         @foreach ($introServices as $service)
+                            @php
+                                $serviceTitle = $service->short_name ?: $objectName($service);
+                            @endphp
                             <div class="karaoke-intro__service">
-                                @if (!empty($service['icon']))
-                                    <span><i class="{{ $service['icon'] }}"></i></span>
+                                @if (!empty($service->icon))
+                                    <span><i class="{{ $service->icon }}"></i></span>
                                 @endif
-                                @if (!empty($service['label']))
-                                    <strong>{{ $service['label'] }}</strong>
+                                @if (!empty($serviceTitle))
+                                    <strong>{{ $serviceTitle }}</strong>
                                 @endif
                             </div>
                         @endforeach
@@ -204,16 +211,16 @@
 
     @if ($constructionWidget)
         <section class="karaoke-card-section karaoke-card-section--construction">
-            @if (!empty($constructionData['background']))
-                <img class="karaoke-section-bg" src="{{ $constructionData['background'] }}"
-                    alt="{{ $constructionData['title'] ?? ($constructionWidget->name ?? '') }}" loading="lazy">
+            @if (!empty($constructionBg))
+                <img class="karaoke-section-bg" src="{{ asset($constructionBg) }}"
+                    alt="{{ $constructionWidget->name ?? '' }}" loading="lazy">
             @endif
             <div class="karaoke-card-section__overlay"></div>
             <div class="karaoke-shell">
-                @if (!empty($constructionData['title']))
+                @if (!empty($constructionWidget->name))
                     <header class="karaoke-section-heading">
                         <span></span>
-                        <h2>{{ $constructionData['title'] }}</h2>
+                        <h2>{{ $constructionWidget->name }}</h2>
                         <span></span>
                     </header>
                 @endif
@@ -241,16 +248,12 @@
 
     @if ($productWidget)
         <section class="karaoke-card-section karaoke-card-section--products">
-            @if (!empty($productData['background']))
-                <img class="karaoke-section-bg" src="{{ $productData['background'] }}"
-                    alt="{{ $productData['title'] ?? ($productWidget->name ?? '') }}" loading="lazy">
-            @endif
             <div class="karaoke-card-section__overlay"></div>
             <div class="karaoke-shell">
-                @if (!empty($productData['title']))
+                @if (!empty($productWidget->name))
                     <header class="karaoke-section-heading">
                         <span></span>
-                        <h2>{{ $productData['title'] }}</h2>
+                        <h2>{{ $productWidget->name }}</h2>
                         <span></span>
                     </header>
                 @endif
@@ -262,7 +265,7 @@
                                 $cardImage = $card->image ?? '';
                                 $cardDescription = strip_tags($objectDescription($card));
                                 $cardUrl = $objectUrl($card);
-                                $cardLabel = $productData['card_link_label'] ?? '';
+                                $cardLabel = $productCardLabel;
                             @endphp
                             <article class="karaoke-product-card">
                                 <a class="karaoke-product-card__image" href="{{ $cardUrl }}"
@@ -289,10 +292,10 @@
                         @endforeach
                     </div>
                 @endif
-                @if (!empty($productData['action']['label']))
+                @if (!empty($productActionLabel))
                     <div class="karaoke-section-action">
-                        <a class="karaoke-btn karaoke-btn--wide" href="{{ $productData['action']['url'] ?? '#' }}">
-                            <span>{{ $productData['action']['label'] }}</span>
+                        <a class="karaoke-btn karaoke-btn--wide" href="#">
+                            <span>{{ $productActionLabel }}</span>
                             <i class="fa fa-long-arrow-right"></i>
                         </a>
                     </div>
@@ -355,7 +358,7 @@
                                 ? json_decode($widget->description, true)
                                 : $widget->description ?? [];
                             $desc = $desc[$languageId] ?? ($desc['1'] ?? $desc);
-                            $limit = $desc['limit'] ?? 6;
+                            $limit = is_numeric($desc) ? (int) $desc : ($desc['limit'] ?? 6);
 
                             $tabCards = collect();
                             if ($widget->model === 'PostCatalogue') {
@@ -416,7 +419,7 @@
                                 ? json_decode($widget->description, true)
                                 : $widget->description ?? [];
                             $desc = $desc[$languageId] ?? ($desc['1'] ?? $desc);
-                            $limit = $desc['limit'] ?? 7;
+                            $limit = is_numeric($desc) ? (int) $desc : ($desc['limit'] ?? 7);
 
                             $posts = collect();
                             if ($widget->model === 'PostCatalogue') {

@@ -57,32 +57,15 @@ class KaraokeHomepageSeeder extends Seeder
             [
                 'name' => 'Giới thiệu AZKTV',
                 'description' => json_encode([
-                    $this->languageId => [
-                        'title' => 'AZKTV Việt Nam',
-                        'subtitle' => 'Chuyên gia thiết kế phòng karaoke',
-                        'body' => 'Chúng tôi cung cấp giải pháp thiết kế và thi công phòng karaoke trọn gói, từ tư vấn ý tưởng, thiết kế concept 3D đến thi công nội thất và lắp đặt hệ thống âm thanh - ánh sáng hoàn chỉnh. Với kinh nghiệm thực hiện hàng trăm phòng karaoke trên toàn quốc, đội ngũ của chúng tôi hiểu rõ cách tạo nên một không gian giải trí vừa đẹp, vừa hiệu quả trong vận hành kinh doanh.',
-                        'features' => [
-                            ['icon' => 'fa fa-trophy', 'label' => 'Kinh nghiệm thực tế'],
-                            ['icon' => 'fa fa-cogs', 'label' => 'Thi công chuẩn kỹ thuật'],
-                            ['icon' => 'fa fa-pencil-square-o', 'label' => 'Thiết kế sáng tạo'],
-                            ['icon' => 'fa fa-line-chart', 'label' => 'Chi phí tối ưu'],
-                        ],
-                        'action' => ['label' => 'Xem thêm', 'url' => '#'],
-                        'services' => [
-                            ['icon' => 'fa fa-cube', 'label' => 'Thiết kế 3D'],
-                            ['icon' => 'fa fa-volume-up', 'label' => 'Thi công cách âm'],
-                            ['icon' => 'fa fa-bullseye', 'label' => 'Lắp đặt âm thanh'],
-                            ['icon' => 'fa fa-object-group', 'label' => 'Ánh sáng & nội thất'],
-                        ],
-                    ],
+                    $this->languageId => 'Chúng tôi cung cấp giải pháp thiết kế và thi công phòng karaoke trọn gói, từ tư vấn ý tưởng, thiết kế concept 3D đến thi công nội thất và lắp đặt hệ thống âm thanh - ánh sáng hoàn chỉnh. Với kinh nghiệm thực hiện hàng trăm phòng karaoke trên toàn quốc, đội ngũ của chúng tôi hiểu rõ cách tạo nên một không gian giải trí vừa đẹp, vừa hiệu quả trong vận hành kinh doanh.',
                 ], JSON_UNESCAPED_UNICODE),
                 'album' => json_encode([
                     '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg',
                     '/uploads/images/thiet-ke/thiet-ke-phong-giam-doc-01.jpg',
                 ], JSON_UNESCAPED_UNICODE),
                 'model_id' => json_encode([]),
-                'model' => 'StaticSection',
-                'short_code' => '',
+                'model' => 'Post',
+                'short_code' => 'Chuyên gia thiết kế phòng karaoke',
                 'publish' => 2,
                 'note' => 'Homepage intro section',
                 'deleted_at' => null,
@@ -126,36 +109,35 @@ class KaraokeHomepageSeeder extends Seeder
             $this->prioritizePostsInCatalogue($newsCatalogueIds[$key], $ids);
         }
 
-        $this->upsertWidget('karaoke-construction', 'Thi công karaoke', 'Post', [706, 704, 703, 702, 701, 700, 699, 698], [
-            'title' => 'Thi công karaoke',
-            'background' => '/userfiles/image/home/karaoke-section-bg.png',
-        ], 'Homepage construction module section');
+        $this->upsertWidget('karaoke-construction', 'Thi công karaoke', 'Post', [706, 704, 703, 702, 701, 700, 699, 698], '', 'Homepage construction module section');
+        DB::table('widgets')->where('keyword', 'karaoke-construction')->update([
+            'album' => json_encode(['/userfiles/image/home/karaoke-section-bg.png'], JSON_UNESCAPED_UNICODE),
+        ]);
 
-        $this->upsertWidget('featured-products', 'Sản phẩm nổi bật', 'Product', $productIds, [
-            'title' => 'Sản phẩm nổi bật',
-            'card_link_label' => 'Xem chi tiết',
-            'action' => ['label' => 'Xem thêm', 'url' => '#'],
-        ], 'Homepage featured product module section');
+        $this->upsertWidget('featured-products', 'Sản phẩm nổi bật', 'Product', $productIds, 'Xem chi tiết', 'Homepage featured product module section');
+        DB::table('widgets')->where('keyword', 'featured-products')->update(['short_code' => 'Xem thêm']);
 
-        $this->upsertWidget('home-designs', 'Tư vấn thiết kế karaoke', 'PostCatalogue', [$designConsultingCatalogueId, $designKaraokeCatalogueId], [
-            'tabs' => [
-                ['key' => 'consulting', 'label' => 'Tư vấn thiết kế', 'active' => true, 'ids' => [$designConsultingCatalogueId], 'post_ids' => $designPostIds],
-                ['key' => 'karaoke-design', 'label' => 'Thiết kế karaoke', 'active' => false, 'ids' => [$designKaraokeCatalogueId], 'post_ids' => $designPostIds],
-            ],
-            'limit' => 6,
-            'action' => ['label' => 'Xem thêm', 'url' => '#'],
-        ], 'Homepage design consulting module section');
+        $this->upsertWidget('home-designs-1', 'Tư vấn thiết kế', 'PostCatalogue', [$designConsultingCatalogueId], '6', 'Homepage design consulting tab');
+        $this->upsertWidget('home-designs-2', 'Thiết kế karaoke', 'PostCatalogue', [$designKaraokeCatalogueId], '6', 'Homepage karaoke design tab');
 
-        $this->upsertWidget('home-news', 'Tin tức - kinh nghiệm - hỏi đáp', 'PostCatalogue', array_values($newsCatalogueIds), [
-            'title' => 'Tin tức - Kinh nghiệm - Hỏi đáp',
-            'columns' => [
-                ['title' => 'Tin tức KTV', 'catalogue_id' => $newsCatalogueIds['news'], 'post_ids' => $newsPostIds['news'], 'limit' => 7],
-                ['title' => 'Kinh nghiệm thi công', 'catalogue_id' => $newsCatalogueIds['experience'], 'post_ids' => $newsPostIds['experience'], 'limit' => 7],
-                ['title' => 'Chuyên đề hỏi đáp', 'catalogue_id' => $newsCatalogueIds['faq'], 'post_ids' => $newsPostIds['faq'], 'limit' => 7],
-            ],
-        ], 'Homepage news experience faq module section');
+        $this->upsertWidget('home-news-1', 'Tin tức KTV', 'PostCatalogue', [$newsCatalogueIds['news']], '7', 'Homepage news column');
+        $this->upsertWidget('home-news-2', 'Kinh nghiệm thi công', 'PostCatalogue', [$newsCatalogueIds['experience']], '7', 'Homepage experience column');
+        $this->upsertWidget('home-news-3', 'Chuyên đề hỏi đáp', 'PostCatalogue', [$newsCatalogueIds['faq']], '7', 'Homepage FAQ column');
+        DB::table('widgets')
+            ->whereIn('keyword', ['home-designs', 'home-news'])
+            ->update([
+                'description' => json_encode([$this->languageId => ''], JSON_UNESCAPED_UNICODE),
+                'deleted_at' => $now,
+                'updated_at' => $now,
+            ]);
 
         $aboutText = 'Chúng tôi cung cấp giải pháp thiết kế và thi công phòng karaoke trọn gói, từ tư vấn ý tưởng, thiết kế concept 3D đến thi công nội thất và lắp đặt hệ thống âm thanh - ánh sáng hoàn chỉnh. Với kinh nghiệm thực hiện hàng trăm phòng karaoke trên toàn quốc, đội ngũ của chúng tôi hiểu rõ cách tạo nên một không gian giải trí vừa đẹp, vừa hiệu quả trong vận hành kinh doanh.';
+        $this->upsertWidget('about-hero', 'Giới thiệu', 'Post', [], '', 'About hero section');
+        DB::table('widgets')->where('keyword', 'about-hero')->update([
+            'album' => json_encode(['/userfiles/image/bg-about-hero.png'], JSON_UNESCAPED_UNICODE),
+            'short_code' => '',
+        ]);
+
         $this->upsertWidget('about-intro', 'AZKTV Việt Nam', 'StaticSection', [], $aboutText, 'Chuyên gia thiết kế phòng karaoke');
         DB::table('widgets')->where('keyword', 'about-intro')->update([
             'short_code' => 'Chuyên gia thiết kế phòng karaoke',
@@ -175,7 +157,30 @@ class KaraokeHomepageSeeder extends Seeder
         $this->updatePostPresentation($aboutFeatureIds[1], 'Thi công chuẩn kỹ thuật', 'fa fa-cogs');
         $this->updatePostPresentation($aboutFeatureIds[2], 'Thiết kế sáng tạo', 'fa fa-pencil-square-o');
         $this->updatePostPresentation($aboutFeatureIds[3], 'Chi phí tối ưu', 'fa fa-line-chart');
+        $this->upsertWidget('intro-features', 'Điểm mạnh giới thiệu trang chủ', 'Post', $aboutFeatureIds, '', 'Homepage intro feature records');
         $this->upsertWidget('about-intro-features', 'Điểm mạnh giới thiệu', 'Post', $aboutFeatureIds, '', 'About intro feature records');
+
+        $serviceIds = $this->seedPosts([
+            ['Thiết kế 3D', 'Lên concept 3D rõ ràng để chốt phương án trước khi thi công.', '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg'],
+            ['Thi công cách âm', 'Xử lý cách âm đúng kỹ thuật cho phòng hát vận hành ổn định.', '/uploads/images/thiet-ke/thiet-ke-phong-hop-01.jpg'],
+            ['Lắp đặt âm thanh', 'Tư vấn và lắp đặt hệ thống âm thanh phù hợp mô hình sử dụng.', '/uploads/images/thiet-ke/thiet-ke-phong-giam-doc-01.jpg'],
+            ['Ánh sáng & nội thất', 'Hoàn thiện ánh sáng, nội thất và điểm nhấn nhận diện phòng hát.', '/uploads/images/thiet-ke/thiet-ke-nha-hang-01.jpg'],
+        ]);
+        $this->updatePostPresentation($serviceIds[0], 'Thiết kế 3D', 'fa fa-cube');
+        $this->updatePostPresentation($serviceIds[1], 'Thi công cách âm', 'fa fa-volume-up');
+        $this->updatePostPresentation($serviceIds[2], 'Lắp đặt âm thanh', 'fa fa-bullseye');
+        $this->updatePostPresentation($serviceIds[3], 'Ánh sáng & nội thất', 'fa fa-object-group');
+        $this->upsertWidget('intro-services', 'Dịch vụ giới thiệu trang chủ', 'Post', $serviceIds, '', 'Homepage intro service records');
+        $this->upsertWidget('about-services', 'Dịch vụ của chúng tôi', 'Post', $serviceIds, $aboutText, 'About service records');
+        DB::table('widgets')->where('keyword', 'about-services')->update([
+            'album' => json_encode(['/userfiles/image/home/karaoke-section-bg.png'], JSON_UNESCAPED_UNICODE),
+        ]);
+
+        $introActionIds = $this->seedPosts([
+            ['Xem thêm', 'Link hành động phần giới thiệu.', '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg'],
+        ]);
+        $this->updatePostPresentation($introActionIds[0], 'Xem thêm', '');
+        $this->upsertWidget('intro-action', 'Nút giới thiệu trang chủ', 'Post', $introActionIds, '', 'Homepage intro action record');
 
         $aboutStatIds = $this->seedPosts([
             ['10+ năm kinh nghiệm', 'Năm kinh nghiệm', '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg'],

@@ -1,7 +1,7 @@
 @php
     $languageId = $config['language'] ?? 1;
     $constructionWidget = $widgets['karaoke-construction'] ?? null;
-    $constructionData = $constructionWidget ? ($constructionWidget->description[$languageId] ?? ($constructionWidget->description['1'] ?? [])) : [];
+    $constructionBg = $constructionWidget->album[0] ?? '';
     $constructionCards = collect($constructionWidget->object ?? []);
     
     $languageOf = static function ($object) {
@@ -12,21 +12,34 @@
     $objectUrl = static fn($object) => !empty($languageOf($object)->pivot->canonical ?? ($languageOf($object)->canonical ?? null))
         ? rewrite_url($languageOf($object)->pivot->canonical ?? $languageOf($object)->canonical)
         : '#';
-    $imageUrl = static fn($image, $index = null) => !empty($image) ? asset($image) : 'https://placehold.co/600x400?text=' . ($index ?? 'Image');
+        
+    $imageFallbacks = [
+        '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg',
+        '/uploads/images/thiet-ke/thiet-ke-phong-hop-01.jpg',
+        '/uploads/images/thiet-ke/thiet-ke-phong-giam-doc-01.jpg',
+        '/uploads/images/thiet-ke/thiet-ke-nha-hang-01.jpg',
+    ];
+    $imageUrl = static function ($path, $index = 0) use ($imageFallbacks) {
+        $path = $path ?: '';
+        if ($path && file_exists(public_path(ltrim($path, '/')))) {
+            return asset($path);
+        }
+        return asset($imageFallbacks[$index % count($imageFallbacks)]);
+    };
 @endphp
 
 @if ($constructionWidget)
     <section class="karaoke-card-section karaoke-card-section--construction">
-        @if (!empty($constructionData['background']))
-            <img class="karaoke-section-bg" src="{{ asset($constructionData['background']) }}"
-                alt="{{ $constructionData['title'] ?? ($constructionWidget->name ?? '') }}" loading="lazy">
+        @if (!empty($constructionBg))
+            <img class="karaoke-section-bg" src="{{ asset($constructionBg) }}"
+                alt="{{ $constructionWidget->name ?? '' }}" loading="lazy">
         @endif
         <div class="karaoke-card-section__overlay"></div>
         <div class="karaoke-shell">
-            @if (!empty($constructionData['title']))
+            @if (!empty($constructionWidget->name))
                 <header class="karaoke-section-heading">
                     <span></span>
-                    <h2>{{ $constructionData['title'] }}</h2>
+                    <h2>{{ $constructionWidget->name }}</h2>
                     <span></span>
                 </header>
             @endif
