@@ -74,6 +74,13 @@ class PostCatalogueController extends FrontendController
             ['keyword' => 'product-category', 'children' => true],
             ['keyword' => 'product-category-highlight', 'object' => true],
             ['keyword' => 'about-us-2'],
+            ['keyword' => 'intro'],
+            ['keyword' => 'about-hero'],
+            ['keyword' => 'about-intro'],
+            ['keyword' => 'about-intro-features', 'object' => true],
+            ['keyword' => 'about-stats', 'object' => true],
+            ['keyword' => 'about-services', 'object' => true],
+            ['keyword' => 'karaoke-construction', 'object' => true],
         ], $this->language);
 
         $slides = $this->slideService->getSlide(
@@ -83,10 +90,10 @@ class PostCatalogueController extends FrontendController
         $lastestNews = LegacyFrontend::postsQuery($this->language)->orderBy('posts.order', 'desc')->orderBy('posts.id', 'desc')->limit(8)->get();
         // dd($lastestNews);
 
-        if($postCatalogue->canonical === 've-chung-toi' && !Agent::isMobile()){
-            $template = 'frontend.post.catalogue.intro';
+        if(in_array($postCatalogue->canonical, ['ve-chung-toi', 'gioi-thieu'])){
+            $template = 'frontend.post.catalogue.about';
         }else{
-            $template = Agent::isMobile() ? 'mobile.post.catalogue.index' : 'frontend.post.catalogue.index';
+            $template = 'frontend.post.catalogue.index';
         }
 
         $config = $this->config();

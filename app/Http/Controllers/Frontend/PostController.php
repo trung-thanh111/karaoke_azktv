@@ -91,7 +91,7 @@ class postController extends FrontendController
         $lastestNews = LegacyFrontend::postsQuery($this->language)->orderBy('posts.order', 'desc')->orderBy('posts.id', 'desc')->limit(8)->get();
 
 
-        $template = Agent::isMobile() ? 'mobile.post.post.index' : 'frontend.post.post.index';
+        $template = 'frontend.post.post.index';
 
         $schema = $this->schema($post, $postCatalogue, $breadcrumb);
         $content = $post->languages->first()->pivot->content;

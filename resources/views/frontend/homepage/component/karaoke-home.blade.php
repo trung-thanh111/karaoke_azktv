@@ -132,9 +132,9 @@
     @if ($introWidget)
         <section class="karaoke-intro">
             <div class="karaoke-shell">
-                <div class="uk-grid uk-flex-middle" data-uk-grid-margin>
+                <div class="karaoke-intro__grid">
                     @if (!empty($introImages))
-                        <div class="uk-width-medium-1-2 karaoke-intro__media">
+                        <div class="karaoke-intro__media">
                             @foreach (array_slice($introImages, 0, 2) as $key => $image)
                                 <div class="karaoke-intro__image karaoke-intro__image--{{ $key + 1 }}">
                                     <img src="{{ $image }}"
@@ -144,7 +144,7 @@
                             @endforeach
                         </div>
                     @endif
-                    <div class="uk-width-medium-1-2 karaoke-intro__content">
+                    <div class="karaoke-intro__content">
                         @if (!empty($introDescription['title']))
                             <h2>{{ $introDescription['title'] }}</h2>
                         @endif
@@ -210,22 +210,20 @@
                     </header>
                 @endif
                 @if ($constructionCards->isNotEmpty())
-                    <div class="uk-grid uk-grid-medium" data-uk-grid-margin>
+                    <div class="karaoke-room-grid">
                         @foreach ($constructionCards as $card)
                             @php
                                 $cardTitle = $objectName($card);
                                 $cardImage = $card->image ?? '';
                                 $cardUrl = $objectUrl($card);
                             @endphp
-                            <div class="uk-width-small-1-2 uk-width-medium-1-2">
-                                <a class="karaoke-room-card" href="{{ $cardUrl }}" title="{{ $cardTitle }}">
+                            <a class="karaoke-room-card" href="{{ $cardUrl }}" title="{{ $cardTitle }}">
                                 @if ($cardImage)
                                     <img src="{{ $imageUrl($cardImage, $loop->index) }}" alt="{{ $cardTitle }}"
                                         loading="lazy">
                                 @endif
                                 <span>{{ $cardTitle }}</span>
-                                </a>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 @endif
@@ -249,7 +247,7 @@
                     </header>
                 @endif
                 @if ($productCards->isNotEmpty())
-                    <div class="uk-grid uk-grid-medium" data-uk-grid-margin>
+                    <div class="karaoke-product-grid">
                         @foreach ($productCards as $card)
                             @php
                                 $cardTitle = $objectName($card);
@@ -258,8 +256,7 @@
                                 $cardUrl = $objectUrl($card);
                                 $cardLabel = $productData['card_link_label'] ?? '';
                             @endphp
-                            <div class="uk-width-small-1-2 uk-width-medium-1-4">
-                                <article class="karaoke-product-card">
+                            <article class="karaoke-product-card">
                                 <a class="karaoke-product-card__image" href="{{ $cardUrl }}"
                                     title="{{ $cardTitle }}">
                                     @if ($cardImage)
@@ -280,8 +277,7 @@
                                             href="{{ $cardUrl }}">{{ $cardLabel }}</a>
                                     @endif
                                 </div>
-                                </article>
-                            </div>
+                            </article>
                         @endforeach
                     </div>
                 @endif
@@ -317,8 +313,18 @@
         $homeNews3 = $widgets['home-news-3'] ?? null;
 
         $designsTabs = [
-            ['key' => 'tab1', 'label' => $homeDesigns1->name ?? 'Thiết kế karaoke', 'active' => true, 'widget' => $homeDesigns1],
-            ['key' => 'tab2', 'label' => $homeDesigns2->name ?? 'Tư vấn thiết kế', 'active' => false, 'widget' => $homeDesigns2],
+            [
+                'key' => 'tab1',
+                'label' => $homeDesigns1->name ?? 'Thiết kế karaoke',
+                'active' => true,
+                'widget' => $homeDesigns1,
+            ],
+            [
+                'key' => 'tab2',
+                'label' => $homeDesigns2->name ?? 'Tư vấn thiết kế',
+                'active' => false,
+                'widget' => $homeDesigns2,
+            ],
         ];
     @endphp
     @if ($homeDesigns1 || $homeDesigns2)
@@ -337,10 +343,12 @@
                     @if ($tab['widget'])
                         @php
                             $widget = $tab['widget'];
-                            $desc = is_string($widget->description) ? json_decode($widget->description, true) : ($widget->description ?? []);
+                            $desc = is_string($widget->description)
+                                ? json_decode($widget->description, true)
+                                : $widget->description ?? [];
                             $desc = $desc[$languageId] ?? ($desc['1'] ?? $desc);
                             $limit = $desc['limit'] ?? 6;
-                            
+
                             $tabCards = collect();
                             if ($widget->model === 'PostCatalogue') {
                                 $tabCards = collect($widget->object ?? [])->flatMap(fn($c) => collect($c->posts ?? []));
@@ -349,16 +357,15 @@
                             }
                             $tabCards = $tabCards->take($limit);
                         @endphp
-                        <div class="uk-grid uk-grid-medium home-designs__panel {{ $tab['active'] ? 'active' : '' }}"
-                            data-home-design-panel="{{ $tab['key'] }}" data-uk-grid-margin>
+                        <div class="grid home-designs__panel {{ $tab['active'] ? 'active' : '' }}"
+                            data-home-design-panel="{{ $tab['key'] }}">
                             @foreach ($tabCards as $card)
                                 @php
                                     $cardTitle = $objectName($card);
                                     $cardDescription = strip_tags($objectDescription($card));
                                     $cardUrl = $objectUrl($card);
                                 @endphp
-                                <div class="uk-width-small-1-2 uk-width-medium-1-3">
-                                    <div class="card">
+                                <div class="card">
                                     <div class="image-wrapper">
                                         <a href="{{ $cardUrl }}">
                                             <img src="{{ $imageUrl($card->image ?? '', $loop->index) }}"
@@ -366,9 +373,7 @@
                                         </a>
                                     </div>
                                     <div class="title">{{ $cardTitle }}</div>
-                                    </div>
                                     <div class="description">{{ Str::limit($cardDescription, 120) }}</div>
-                                </div>
                                 </div>
                             @endforeach
                         </div>
@@ -383,11 +388,7 @@
     @endif
 
     @php
-        $newsCols = [
-            $homeNews1,
-            $homeNews2,
-            $homeNews3,
-        ];
+        $newsCols = [$homeNews1, $homeNews2, $homeNews3];
         $newsCols = array_filter($newsCols);
     @endphp
 
@@ -400,13 +401,15 @@
                     <span></span>
                 </header>
 
-                <div class="uk-grid uk-grid-medium" data-uk-grid-margin>
+                <div class="grid">
                     @foreach ($newsCols as $widget)
                         @php
-                            $desc = is_string($widget->description) ? json_decode($widget->description, true) : ($widget->description ?? []);
+                            $desc = is_string($widget->description)
+                                ? json_decode($widget->description, true)
+                                : $widget->description ?? [];
                             $desc = $desc[$languageId] ?? ($desc['1'] ?? $desc);
                             $limit = $desc['limit'] ?? 7;
-                            
+
                             $posts = collect();
                             if ($widget->model === 'PostCatalogue') {
                                 $posts = collect($widget->object ?? [])->flatMap(fn($c) => collect($c->posts ?? []));
@@ -420,9 +423,8 @@
                             $featureTitle = $feature ? $objectName($feature) : '';
                             $featureUrl = $feature ? $objectUrl($feature) : '#';
                         @endphp
-                        <div class="uk-width-small-1-2 uk-width-medium-1-3">
-                            <div class="column">
-                                <div class="col-header">{{ $widget->name }}</div>
+                        <div class="column">
+                            <div class="col-header">{{ $widget->name }}</div>
                             @if ($feature)
                                 <div class="image-wrapper with-corners">
                                     <a href="{{ $featureUrl }}">
@@ -433,4 +435,20 @@
                                 <div class="card-body">
                                     <a class="card-title" href="{{ $featureUrl }}">{{ $featureTitle }}</a>
                                     @if ($listPosts->isNotEmpty())
-                                        <ul class="ne
+                                        <ul class="news-list">
+                                            @foreach ($listPosts as $listObject)
+                                                <li><a
+                                                        href="{{ $objectUrl($listObject) }}">{{ $objectName($listObject) }}</a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+</main>

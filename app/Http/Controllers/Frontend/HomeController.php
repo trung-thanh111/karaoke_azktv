@@ -73,7 +73,7 @@ class HomeController extends FrontendController
         ];
         $schema = $this->schema($seo);
         $legacy = LegacyFrontend::homePayload($this->language);
-        $template = Agent::isMobile() ? 'mobile.homepage.home.index' : 'frontend.homepage.home.index';
+        $template = 'frontend.homepage.home.index';
         return view($template, compact(
             'config',
             'slides',

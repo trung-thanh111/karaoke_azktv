@@ -19,6 +19,7 @@
     <link href="{{ asset('templates/mobile/uikit/css/uikit.docs.simp.min.css') }}" rel="stylesheet">
     <link href="{{ asset('templates/mobile/plugins/flex-slider/flexslider.css') }}" rel="stylesheet">
     <link href="{{ asset('templates/mobile/css/style.css') }}" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('templates/mobile/js/jquery-2.1.3.min.js') }}"></script>
 </head>
 <body>

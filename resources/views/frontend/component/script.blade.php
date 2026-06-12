@@ -4,6 +4,7 @@
 <script src="{{ asset('templates/frontend/resources/uikit/js/components/lightbox.min.js') }}"></script>
 <script src="{{ asset('templates/frontend/resources/uikit/js/components/accordion.min.js') }}"></script>
 <script src="{{ asset('templates/frontend/resources/plugins/flex-slider/jquery.flexslider-min.js') }}"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script src="{{ asset('templates/frontend/resources/function.js') }}"></script>
 <script src="{{ asset('templates/frontend/resources/js/karaoke-home.js') }}"></script>
 <script>

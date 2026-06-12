@@ -36,10 +36,11 @@
 
 <div class="ibox short-code">
     <div class="ibox-title">
-        <h5>Short Code</h5>
+        <h5>Short Code <span class="text-danger">(*)</span></h5>
     </div>
     <div class="ibox-content">
-        <textarea name="short_code" class="textarea form-control">{{ old('short_code', ($widget->short_code) ?? null) }}</textarea>
+        <textarea name="short_code" class="textarea form-control" placeholder="Hệ thống sẽ tự động tạo short code nếu bỏ trống...">{{ old('short_code', ($widget->short_code) ?? null) }}</textarea>
+        <span class="text-muted" style="font-size: 11px; margin-top: 5px; display: block;">* Nếu bỏ trống, short code sẽ tự động tạo theo dạng [từ-khóa-widget]</span>
     </div>
 </div>
 

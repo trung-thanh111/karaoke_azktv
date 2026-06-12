@@ -723,16 +723,22 @@ class WidgetService extends BaseService
             ORDER BY o.order DESC
         ";
 
-        return collect(DB::select($sql, [$language, $language]))->map(function ($item) use ($model) {
+        return collect(DB::select($sql, [$language, $language]))->map(function ($item) use ($model, $language) {
             // Process similar to getObjectsBatch
-            $item->languages = (object) [
+            $item->languages = collect([(object) [
                 'name' => $item->language_name,
                 'canonical' => $item->canonical,
                 'meta_title' => $item->meta_title,
                 'meta_description' => $item->meta_description,
                 'description' => $item->language_description,
-                'content' => $item->content
-            ];
+                'content' => $item->content,
+                'pivot' => (object) [
+                    'name' => $item->language_name,
+                    'canonical' => $item->canonical,
+                    'description' => $item->language_description,
+                    'language_id' => $language
+                ]
+            ]]);
 
             if ($item->catalogue_ids) {
                 $catalogueIds = explode(',', $item->catalogue_ids);

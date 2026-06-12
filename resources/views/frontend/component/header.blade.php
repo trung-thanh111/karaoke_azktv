@@ -5,7 +5,7 @@
         return strpos(strtolower($item['title']), 'dmca') === false && strpos(strtolower($item['title']), 'img') === false;
     });
 @endphp
-<header class="header-new" id="header">
+<header class="header-new {{ (isset($postCatalogue) && in_array($postCatalogue->canonical, ['gioi-thieu', 've-chung-toi'])) ? 'header-transparent' : '' }}" id="header">
     <section class="topbar-new uk-visible-large">
         <div class="uk-container uk-container-center">
             <div class="container">
@@ -31,7 +31,7 @@
         </div>
     </section>
 
-    <section class="main-header-new uk-visible-large">
+    <section class="main-header-new">
         <div class="uk-container uk-container-center">
             <div class="container">
                 <div class="logo">
@@ -56,7 +56,9 @@
         </div>
     </section>
 
-    <section class="mobile-header uk-hidden-large">
+    
+
+    <section class="mobile-header-new uk-hidden-large">
         <a href="#offcanvas" class="toggle-btn" data-uk-offcanvas="{target:'#offcanvas'}"><i class="fa fa-bars"></i></a>
         <div class="logo">
             <a href="{{ url('/') }}" title="{{ $system['seo_meta_title'] ?? '' }}">

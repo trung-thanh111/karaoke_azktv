@@ -148,7 +148,7 @@ class ProductController extends FrontendController
         $seo = seo($product);
         $schema = $this->schema($product, $productCatalogue, $breadcrumb);
         $legacy = LegacyFrontend::productPayload($product, $productCatalogue, $breadcrumb, $productRelated, $cartSeen);
-        $template = Agent::isMobile() ? 'mobile.product.product.index' : 'frontend.product.product.index';
+        $template = 'frontend.product.product.index';
 
         return view($template, compact(
             'config',

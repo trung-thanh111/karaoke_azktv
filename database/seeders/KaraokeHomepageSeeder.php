@@ -126,7 +126,7 @@ class KaraokeHomepageSeeder extends Seeder
             $this->prioritizePostsInCatalogue($newsCatalogueIds[$key], $ids);
         }
 
-        $this->upsertWidget('karaoke-construction', 'Thi công karaoke', 'Post', $constructionIds, [
+        $this->upsertWidget('karaoke-construction', 'Thi công karaoke', 'Post', [706, 704, 703, 702, 701, 700, 699, 698], [
             'title' => 'Thi công karaoke',
             'background' => '/userfiles/image/home/karaoke-section-bg.png',
         ], 'Homepage construction module section');
@@ -154,6 +154,41 @@ class KaraokeHomepageSeeder extends Seeder
                 ['title' => 'Chuyên đề hỏi đáp', 'catalogue_id' => $newsCatalogueIds['faq'], 'post_ids' => $newsPostIds['faq'], 'limit' => 7],
             ],
         ], 'Homepage news experience faq module section');
+
+        $aboutText = 'Chúng tôi cung cấp giải pháp thiết kế và thi công phòng karaoke trọn gói, từ tư vấn ý tưởng, thiết kế concept 3D đến thi công nội thất và lắp đặt hệ thống âm thanh - ánh sáng hoàn chỉnh. Với kinh nghiệm thực hiện hàng trăm phòng karaoke trên toàn quốc, đội ngũ của chúng tôi hiểu rõ cách tạo nên một không gian giải trí vừa đẹp, vừa hiệu quả trong vận hành kinh doanh.';
+        $this->upsertWidget('about-intro', 'AZKTV Việt Nam', 'StaticSection', [], $aboutText, 'Chuyên gia thiết kế phòng karaoke');
+        DB::table('widgets')->where('keyword', 'about-intro')->update([
+            'short_code' => 'Chuyên gia thiết kế phòng karaoke',
+            'album' => json_encode([
+                '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg',
+                '/uploads/images/thiet-ke/thiet-ke-phong-giam-doc-01.jpg',
+            ], JSON_UNESCAPED_UNICODE),
+        ]);
+
+        $aboutFeatureIds = $this->seedPosts([
+            ['Kinh nghiệm thực tế', 'Đội ngũ đã triển khai nhiều mô hình phòng karaoke thực tế.', '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg'],
+            ['Thi công chuẩn kỹ thuật', 'Quy trình thi công bám sát tiêu chuẩn âm học và vận hành.', '/uploads/images/thiet-ke/thiet-ke-phong-hop-01.jpg'],
+            ['Thiết kế sáng tạo', 'Concept thiết kế riêng theo mô hình kinh doanh và ngân sách.', '/uploads/images/thiet-ke/thiet-ke-phong-giam-doc-01.jpg'],
+            ['Chi phí tối ưu', 'Tối ưu vật liệu, thiết bị và ngân sách đầu tư thực tế.', '/uploads/images/thiet-ke/thiet-ke-nha-hang-01.jpg'],
+        ]);
+        $this->updatePostPresentation($aboutFeatureIds[0], 'Kinh nghiệm thực tế', 'fa fa-trophy');
+        $this->updatePostPresentation($aboutFeatureIds[1], 'Thi công chuẩn kỹ thuật', 'fa fa-cogs');
+        $this->updatePostPresentation($aboutFeatureIds[2], 'Thiết kế sáng tạo', 'fa fa-pencil-square-o');
+        $this->updatePostPresentation($aboutFeatureIds[3], 'Chi phí tối ưu', 'fa fa-line-chart');
+        $this->upsertWidget('about-intro-features', 'Điểm mạnh giới thiệu', 'Post', $aboutFeatureIds, '', 'About intro feature records');
+
+        $aboutStatIds = $this->seedPosts([
+            ['10+ năm kinh nghiệm', 'Năm kinh nghiệm', '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg'],
+            ['34+ tỉnh thành', 'Tỉnh thành', '/uploads/images/thiet-ke/thiet-ke-phong-hop-01.jpg'],
+            ['10+ quốc gia', 'Quốc gia', '/uploads/images/thiet-ke/thiet-ke-phong-giam-doc-01.jpg'],
+            ['500+ dự án hoàn thành', 'Dự án hoàn thành', '/uploads/images/thiet-ke/thiet-ke-nha-hang-01.jpg'],
+        ]);
+        $this->updatePostPresentation($aboutStatIds[0], '10+', '');
+        $this->updatePostPresentation($aboutStatIds[1], '34+', '');
+        $this->updatePostPresentation($aboutStatIds[2], '10+', '');
+        $this->updatePostPresentation($aboutStatIds[3], '500+', '');
+        $this->upsertWidget('about-stats', 'Số liệu giới thiệu', 'Post', $aboutStatIds, '', 'About intro statistic records');
+
     }
 
     private function seedPosts(array $items): array
@@ -262,7 +297,7 @@ class KaraokeHomepageSeeder extends Seeder
         return (int) $productId;
     }
 
-    private function upsertWidget(string $keyword, string $name, string $model, array $modelIds, array $description, string $note): void
+    private function upsertWidget(string $keyword, string $name, string $model, array $modelIds, array|string $description, string $note): void
     {
         $now = now();
         DB::table('widgets')->updateOrInsert(
@@ -299,5 +334,15 @@ class KaraokeHomepageSeeder extends Seeder
                 ]
             );
         }
+    }
+
+    private function updatePostPresentation(int $postId, string $shortName, string $icon): void
+    {
+        DB::table('posts')->where('id', $postId)->update([
+            'short_name' => $shortName,
+            'icon' => $icon,
+            'pubish' => 2,
+            'deleted_at' => null,
+        ]);
     }
 }

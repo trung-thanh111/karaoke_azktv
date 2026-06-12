@@ -80,7 +80,7 @@ class ProductCatalogueController extends FrontendController
         $seo = seo($productCatalogue, $page);
         $schema = $this->schema($productCatalogue, $products, $breadcrumb);
         $legacy = LegacyFrontend::productCataloguePayload($productCatalogue, $products, $breadcrumb, $this->language);
-        $template = Agent::isMobile() ? 'mobile.product.catalogue.index' : 'frontend.product.catalogue.index';
+        $template = 'frontend.product.catalogue.index';
         return view($template, compact(
             'descendantTrees',
             'config',
@@ -160,11 +160,7 @@ class ProductCatalogueController extends FrontendController
             'canonical' => write_url('tim-kiem')
         ];
 
-        if (Agent::isMobile()) {
-            $template = 'mobile.product.catalogue.search';
-        } else {
-            $template = 'frontend.product.catalogue.search';
-        }
+        $template = 'frontend.product.catalogue.search';
 
 
         $productItems = method_exists($products, 'items') ? $products->items() : $products;

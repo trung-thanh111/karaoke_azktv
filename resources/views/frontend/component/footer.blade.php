@@ -3,8 +3,8 @@
 @endphp
 <footer class="footer-new" id="footer">
     <div class="uk-container uk-container-center">
-        <div class="uk-grid uk-grid-medium" data-uk-grid-margin>
-            <div class="uk-width-small-1-2 uk-width-medium-1-4">
+        <div class="container">
+            <div class="col">
                 <div class="col-title">VỀ
                     {{ mb_strtoupper($system['homepage_brandname'] ?? 'THIẾT KẾ THI CÔNG KARAOKE AZKTV') }}</div>
                 <div class="col-content">
@@ -12,15 +12,17 @@
                 </div>
             </div>
 
-            <div class="uk-width-small-1-2 uk-width-medium-1-4">
+            <div class="col">
                 <div class="col-title">{{ mb_strtoupper($system['homepage_company'] ?? 'CTCP GIẢI TRÍ AZKTV VIỆT NAM') }}
                 </div>
                 <div class="col-content">
                     <ul>
                         <li><i class="fa fa-map-marker"></i>
-                            <span><strong>VP:</strong>&nbsp;{{ $system['contact_address'] ?? '' }}</span></li>
+                            <span><strong>VP:</strong>&nbsp;{{ $system['contact_address'] ?? '' }}</span>
+                        </li>
                         <li><i class="fa fa-map-marker"></i>
-                            <span><strong>VP2:</strong>&nbsp;{{ $system['contact_address_2'] ?? '' }}</span></li>
+                            <span><strong>VP2:</strong>&nbsp;{{ $system['contact_address_2'] ?? '' }}</span>
+                        </li>
                         <li><i class="fa fa-map-marker"></i>
                             <span><strong>VP3:</strong>&nbsp;{{ explode('-', $system['contact_address_3'] ?? '')[0] ?? '' }}</span>
                         </li>
@@ -28,12 +30,13 @@
                                     xuất:</strong>&nbsp;{{ explode('-', $system['contact_address_3'] ?? '')[1] ?? '' }}</span>
                         </li>
                         <li><i class="fa fa-phone"></i>
-                            <span><strong>Hotline:</strong>&nbsp;{{ $system['contact_hotline'] ?? '' }}</span></li>
+                            <span><strong>Hotline:</strong>&nbsp;{{ $system['contact_hotline'] ?? '' }}</span>
+                        </li>
                     </ul>
                 </div>
             </div>
 
-            <div class="uk-width-small-1-2 uk-width-medium-1-4">
+            <div class="col">
                 <div class="col-title">THÔNG TIN</div>
                 <div class="col-content">
                     @if (count($footerMenu))
@@ -62,7 +65,7 @@
                     </form>
                 </div>
             </div>
-            <div class="uk-width-small-1-2 uk-width-medium-1-4">
+            <div class="col">
                 <div class="col-title">FANPAGE</div>
                 <div class="col-content">
                     <a href="{{ $system['seo_facebook'] ?? '#' }}" target="_blank">

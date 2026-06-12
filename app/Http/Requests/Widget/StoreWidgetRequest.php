@@ -28,12 +28,22 @@ class StoreWidgetRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation()
+    {
+        if (!$this->filled('short_code') && $this->filled('keyword')) {
+            $this->merge([
+                'short_code' => '[' . $this->input('keyword') . ']',
+            ]);
+        }
+    }
+
     public function messages(): array
     {
         return [
             'name.required' => 'Bạn chưa nhập tên của Widget',
             'keyword.required' => 'Bạn chưa nhập từ khóa của Widget',
             'keyword.unique' => 'Từ khóa đã tồn tại, hãy chọn từ khóa khác',
+            'short_code.required' => 'Bạn chưa nhập Short Code của Widget',
             'short_code.unique' => 'Shortcode đã tồn tại, hãy chọn tên shortcode khác',
         ];
     }

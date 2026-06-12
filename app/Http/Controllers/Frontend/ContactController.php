@@ -42,7 +42,7 @@ class ContactController extends FrontendController
             'meta_image' => '',
             'canonical' => write_url('lien-he')
         ];
-        $template = Agent::isMobile() ? 'mobile.contact.index' : 'frontend.contact.index';
+        $template = 'frontend.contact.index';
         
         $slides = $this->slideService->getSlide(
             ['main-slide'],
