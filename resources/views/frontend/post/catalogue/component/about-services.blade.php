@@ -1,30 +1,39 @@
 @php
-    $languageId = $config['language'] ?? 1;
-    $servicesWidget = $widgets['about-services'] ?? null;
-    $services = collect($servicesWidget->object ?? []);
-    $servicesDesc = $servicesWidget ? ($servicesWidget->description[$languageId] ?? ($servicesWidget->description['1'] ?? '')) : '';
-    if (is_string($servicesDesc)) {
-        $cleanedDesc = html_entity_decode(strip_tags($servicesDesc));
-        $decoded = json_decode($cleanedDesc, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            $servicesDesc = $decoded;
-        } else {
-            $servicesDesc = $cleanedDesc;
+    $servicesHeading = $introduce['block_8_heading'] ?? 'Dịch vụ của chúng tôi';
+    $servicesDescription = $introduce['block_8_description'] ?? '';
+    
+    $services = [];
+    $serviceIcons = [
+        1 => 'fa fa-cube',
+        2 => 'fa fa-volume-up',
+        3 => 'fa fa-bullseye',
+        4 => 'fa fa-object-group',
+        5 => 'fa fa-cogs'
+    ];
+    for ($i = 1; $i <= 5; $i++) {
+        $title = $introduce["block_8_block_{$i}_title"] ?? '';
+        $desc = $introduce["block_8_block_{$i}_description"] ?? '';
+        if ($title) {
+            $services[] = [
+                'title' => $title,
+                'description' => $desc,
+                'icon' => $serviceIcons[$i] ?? 'fa fa-cogs'
+            ];
         }
     }
-    $servicesDescription = is_array($servicesDesc) ? ($servicesDesc['body'] ?? '') : $servicesDesc;
-    $servicesBg = isset($servicesWidget->album) && is_array($servicesWidget->album) ? ($servicesWidget->album[0] ?? '/userfiles/image/home/karaoke-section-bg.png') : '/userfiles/image/home/karaoke-section-bg.png';
+    
+    $servicesBg = $introduce['block_8_image'] ?? '/userfiles/image/home/karaoke-section-bg.png';
 @endphp
 
-@if($servicesWidget && $services->isNotEmpty())
+@if(count($services) > 0)
 <section class="karaoke-card-section karaoke-card-section--services">
-    <img class="karaoke-section-bg" src="{{ asset($servicesBg) }}" alt="Dịch vụ của chúng tôi" loading="lazy">
+    <img class="karaoke-section-bg" src="{{ asset($servicesBg) }}" alt="{{ $servicesHeading }}" loading="lazy">
     <div class="karaoke-card-section__overlay"></div>
 
     <div class="karaoke-shell">
         <header class="karaoke-section-heading">
             <span></span>
-            <h2>Dịch vụ của chúng tôi</h2>
+            <h2>{{ $servicesHeading }}</h2>
             <span></span>
         </header>
 
@@ -34,25 +43,12 @@
 
         <div class="karaoke-services-grid">
             @foreach($services as $service)
-                @php
-                    if (is_object($service)) {
-                        $title = $service->short_name ?? ($service->languages->first()->pivot->name ?? '');
-                        $icon = $service->icon ?? '';
-                    } else {
-                        $title = $service['label'] ?? '';
-                        $icon = $service['icon'] ?? '';
-                    }
-                @endphp
-                @if($title)
-                    <article class="karaoke-service-card">
-                        <span class="karaoke-service-card__icon">
-                            @if($icon)
-                                <i class="{{ $icon }}"></i>
-                            @endif
-                        </span>
-                        <strong>{{ $title }}</strong>
-                    </article>
-                @endif
+                <article class="karaoke-service-card">
+                    <span class="karaoke-service-card__icon">
+                        <i class="{{ $service['icon'] }}"></i>
+                    </span>
+                    <strong>{{ $service['title'] }}</strong>
+                </article>
             @endforeach
         </div>
     </div>

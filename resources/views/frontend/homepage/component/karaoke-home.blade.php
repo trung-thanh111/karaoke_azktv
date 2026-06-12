@@ -13,18 +13,34 @@
         ['label' => 'Nhận báo giá miễn phí', 'url' => '#'],
         ['label' => 'Xem các mẫu phòng', 'url' => '#'],
     ];
-    $introWidget = $widgets['intro'] ?? null;
-    $introDescription = $introWidget->description[$languageId] ?? ($introWidget->description['1'] ?? '');
-    $introImages = $introWidget->album ?? [];
-    $introFeatures = collect($widgets['intro-features']->object ?? []);
-    $introServices = collect($widgets['intro-services']->object ?? []);
-    $introAction = collect($widgets['intro-action']->object ?? [])->first();
+    $introTitle = $introduce['block_1_company'] ?? '';
+    $introSubtitle = $introduce['block_1_en'] ?? '';
+    $introDescription = $introduce['block_1_description'] ?? '';
+    $introImages = array_values(array_filter([
+        $introduce['block_3_image_1'] ?? '',
+        $introduce['block_3_image_2'] ?? '',
+    ]));
+    $introFeatures = collect([
+        ['title' => $introduce['block_9_block_1_title'] ?? '', 'icon' => 'fa fa-trophy'],
+        ['title' => $introduce['block_9_block_2_title'] ?? '', 'icon' => 'fa fa-cogs'],
+        ['title' => $introduce['block_9_block_3_title'] ?? '', 'icon' => 'fa fa-pencil-square-o'],
+        ['title' => $introduce['block_9_block_4_title'] ?? '', 'icon' => 'fa fa-line-chart'],
+    ])->filter(fn($item) => !empty($item['title']));
+    $introServices = collect([
+        ['title' => $introduce['block_8_block_1_title'] ?? '', 'icon' => 'fa fa-cube'],
+        ['title' => $introduce['block_8_block_2_title'] ?? '', 'icon' => 'fa fa-volume-up'],
+        ['title' => $introduce['block_8_block_3_title'] ?? '', 'icon' => 'fa fa-bullseye'],
+        ['title' => $introduce['block_8_block_4_title'] ?? '', 'icon' => 'fa fa-object-group'],
+    ])->filter(fn($item) => !empty($item['title']));
+    $introButtonLabel = $introduce['block_1_button_label'] ?? '';
+    $introButtonLink = $introduce['block_1_button_link'] ?? '#';
     $constructionWidget = $widgets['karaoke-construction'] ?? null;
     $constructionBg = $constructionWidget->album[0] ?? '';
     $constructionCards = collect($constructionWidget->object ?? []);
     $productWidget = $widgets['featured-products'] ?? null;
     $productCardLabel = $productWidget->description[$languageId] ?? ($productWidget->description['1'] ?? '');
     $productActionLabel = $productWidget->short_code ?? '';
+    $productActionUrl = $productWidget->note ?? '#';
     $productCards = collect($productWidget->object ?? []);
     $designsWidget = $widgets['home-designs'] ?? null;
     $designsData = $designsWidget
@@ -138,7 +154,7 @@
         </section>
     @endif
 
-    @if ($introWidget)
+    @if (!empty($introTitle) || !empty($introDescription) || !empty($introImages))
         <section class="karaoke-intro">
             <div class="karaoke-shell">
                 <div class="karaoke-intro__grid">
@@ -147,18 +163,18 @@
                             @foreach (array_slice($introImages, 0, 2) as $key => $image)
                                 <div class="karaoke-intro__image karaoke-intro__image--{{ $key + 1 }}">
                                     <img src="{{ $image }}"
-                                        alt="{{ $introWidget->name ?? '' }}"
+                                        alt="{{ $introTitle }}"
                                         loading="lazy">
                                 </div>
                             @endforeach
                         </div>
                     @endif
                     <div class="karaoke-intro__content">
-                        @if (!empty($introWidget->name))
-                            <h2>{{ $introWidget->name }}</h2>
+                        @if (!empty($introTitle))
+                            <h2>{{ $introTitle }}</h2>
                         @endif
-                        @if (!empty($introWidget->short_code))
-                            <div class="karaoke-intro__subtitle">{{ $introWidget->short_code }}</div>
+                        @if (!empty($introSubtitle))
+                            <div class="karaoke-intro__subtitle">{{ $introSubtitle }}</div>
                         @endif
                         @if (!empty($introDescription))
                             <div class="karaoke-intro__body">{!! nl2br(e($introDescription)) !!}</div>
@@ -166,23 +182,20 @@
                         @if ($introFeatures->isNotEmpty())
                             <div class="karaoke-intro__features">
                                 @foreach ($introFeatures as $feature)
-                                    @php
-                                        $featureTitle = $feature->short_name ?: $objectName($feature);
-                                    @endphp
                                     <div class="karaoke-intro__feature">
-                                        @if (!empty($feature->icon))
-                                            <span><i class="{{ $feature->icon }}"></i></span>
+                                        @if (!empty($feature['icon']))
+                                            <span><i class="{{ $feature['icon'] }}"></i></span>
                                         @endif
-                                        @if (!empty($featureTitle))
-                                            <strong>{{ $featureTitle }}</strong>
+                                        @if (!empty($feature['title']))
+                                            <strong>{{ $feature['title'] }}</strong>
                                         @endif
                                     </div>
                                 @endforeach
                             </div>
                         @endif
-                        @if (!empty($introAction))
-                            <a class="karaoke-btn karaoke-btn--wide" href="{{ $objectUrl($introAction) }}">
-                                <span>{{ $introAction->short_name ?: $objectName($introAction) }}</span>
+                        @if (!empty($introButtonLabel))
+                            <a class="karaoke-btn karaoke-btn--wide" href="{{ $introButtonLink ?: '#' }}">
+                                <span>{{ $introButtonLabel }}</span>
                                 <i class="fa fa-long-arrow-right"></i>
                             </a>
                         @endif
@@ -191,15 +204,12 @@
                 @if ($introServices->isNotEmpty())
                     <div class="karaoke-intro__services">
                         @foreach ($introServices as $service)
-                            @php
-                                $serviceTitle = $service->short_name ?: $objectName($service);
-                            @endphp
                             <div class="karaoke-intro__service">
-                                @if (!empty($service->icon))
-                                    <span><i class="{{ $service->icon }}"></i></span>
+                                @if (!empty($service['icon']))
+                                    <span><i class="{{ $service['icon'] }}"></i></span>
                                 @endif
-                                @if (!empty($serviceTitle))
-                                    <strong>{{ $serviceTitle }}</strong>
+                                @if (!empty($service['title']))
+                                    <strong>{{ $service['title'] }}</strong>
                                 @endif
                             </div>
                         @endforeach
@@ -294,7 +304,7 @@
                 @endif
                 @if (!empty($productActionLabel))
                     <div class="karaoke-section-action">
-                        <a class="karaoke-btn karaoke-btn--wide" href="#">
+                        <a class="karaoke-btn karaoke-btn--wide" href="{{ $productActionUrl ?: '#' }}">
                             <span>{{ $productActionLabel }}</span>
                             <i class="fa fa-long-arrow-right"></i>
                         </a>
@@ -337,6 +347,8 @@
                 'widget' => $homeDesigns2,
             ],
         ];
+        $designActionLabel = $homeDesigns1->short_code ?? 'Xem thêm';
+        $designActionUrl = $homeDesigns1->note ?? '#';
     @endphp
     @if ($homeDesigns1 || $homeDesigns2)
         <section class="home-designs">
@@ -392,7 +404,7 @@
                 @endforeach
 
                 <div class="action">
-                    <a href="#" class="btn-more">Xem thêm <i class="fa fa-long-arrow-right"></i></a>
+                    <a href="{{ $designActionUrl ?: '#' }}" class="btn-more">{{ $designActionLabel ?: 'Xem thêm' }} <i class="fa fa-long-arrow-right"></i></a>
                 </div>
             </div>
         </section>

@@ -7,8 +7,22 @@
     </div>
     <div class="ibox-content">
         @php
-            $album = (isset($model->album) && is_array($model->album)) ? $model->album : ( (!empty($model->album)) ? json_decode($model->album) : [] );
-            $gallery = (isset($album) && count($album) ) ? $album : old('album');
+            $albumRaw = (isset($model->album) && is_array($model->album)) ? $model->album : ( (!empty($model->album)) ? json_decode($model->album, true) : [] );
+            $album = [];
+            if (is_array($albumRaw)) {
+                foreach ($albumRaw as $item) {
+                    if (is_array($item)) {
+                        $img = $item['images'] ?? ($item['image'] ?? '');
+                        if (!empty($img)) {
+                            $album[] = $img;
+                        }
+                    } elseif (is_string($item)) {
+                        $album[] = $item;
+                    }
+                }
+            }
+            $oldAlbum = old('album');
+            $gallery = (isset($album) && count($album)) ? $album : (is_array($oldAlbum) ? $oldAlbum : []);
         @endphp
         <div class="row">
             <div class="col-lg-12">

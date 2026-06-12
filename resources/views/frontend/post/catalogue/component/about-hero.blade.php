@@ -1,13 +1,9 @@
 @php
-    $languageId = $config['language'] ?? 1;
-    $hero = $widgets['about-hero'] ?? null;
-    $heroDesc = $hero ? ($hero->description[$languageId] ?? ($hero->description['1'] ?? '')) : '';
-    $heroTitle = $hero->name ?? '';
-    $heroBg = isset($hero->album) && is_array($hero->album) ? ($hero->album[0] ?? '') : '';
+    $heroTitle = $introduce['block_1_company'] ?? ($postCatalogue->name ?? 'Giới thiệu');
+    $heroBg = $introduce['block_1_image'] ?? '/userfiles/thumb/Images/bg-about-hero.png';
 @endphp
-@if($hero)
 <section class="about-hero">
-    @if($heroBg)
+    @if(!empty($heroBg))
         <img class="about-hero__bg" src="{{ asset($heroBg) }}" alt="{{ $heroTitle }}" loading="lazy">
     @endif
     <div class="hero-overlay"></div>
@@ -19,4 +15,3 @@
         </h1>
     </div>
 </section>
-@endif

@@ -175,6 +175,17 @@ return [
             ]
         ],
         [
+            'title' => 'QL Giới thiệu',
+            'icon' => 'fa fa-info-circle',
+            'name' => ['introduce'],
+            'subModule' => [
+                [
+                    'title' => 'Cài đặt Giới thiệu',
+                    'route' => 'introduce/index'
+                ],
+            ]
+        ],
+        [
             'title' => 'Cấu hình chung',
             'icon' => 'fa fa-file',
             'name' => ['language', 'generate', 'system', 'widget'],

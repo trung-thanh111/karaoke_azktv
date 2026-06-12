@@ -203,7 +203,7 @@ class WidgetService extends BaseService
         $keywordList = "'" . implode("','", $escapedKeywords) . "'";
 
         $results = DB::select("
-            SELECT id, name, keyword, model, model_id, short_code, description, album 
+            SELECT id, name, keyword, model, model_id, short_code, description, album, note
             FROM widgets 
             WHERE keyword IN ({$keywordList})
             AND publish = 2 

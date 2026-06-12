@@ -20,9 +20,11 @@ class Introduce{
                 'connect_count' => ['type' => 'text', 'label' => 'Số trường kết nối'],
                 'image' => ['type' => 'images', 'label' => 'Ảnh'],
                 'fanpage_link' => ['type' => 'text', 'label' => 'Fanpage Link'],
+                'button_label' => ['type' => 'text', 'label' => 'Nhãn nút'],
+                'button_link' => ['type' => 'text', 'label' => 'Link nút'],
             ]
         ];
-        $data['block_1'] = [
+        $data['block_2'] = [
             'label' => 'Khối 2',
             'description' => 'Cài đặt đầy đủ thông tin khối dưới đây',
             'value' => [
@@ -109,6 +111,7 @@ class Introduce{
             'value' => [
                 'heading' =>  ['type' => 'text', 'label' => 'Tiêu đề'],
                 'description' =>  ['type' => 'textarea', 'label' => 'mô tả'],
+                'image' => ['type' => 'images', 'label' => 'Ảnh nền'],
                 'block_1_title' => ['type' => 'text', 'label' => 'Tiêu đề 1'],
                 'block_1_description' => ['type' => 'editor', 'label' => 'Mô tả 1'],
                 'block_2_title' => ['type' => 'text', 'label' => 'Tiêu đề 2'],
@@ -133,6 +136,8 @@ class Introduce{
                 'block_2_description' => ['type' => 'editor', 'label' => 'Mô tả 2'],
                 'block_3_title' => ['type' => 'text', 'label' => 'Tiêu đề 3'],
                 'block_3_description' => ['type' => 'editor', 'label' => 'Mô tả 3'],
+                'block_4_title' => ['type' => 'text', 'label' => 'Tiêu đề 4'],
+                'block_4_description' => ['type' => 'editor', 'label' => 'Mô tả 4'],
             ]
         ];
         return $data;

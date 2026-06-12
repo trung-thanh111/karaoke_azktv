@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class KaraokeHomepageSeeder extends Seeder
 {
@@ -115,10 +117,17 @@ class KaraokeHomepageSeeder extends Seeder
         ]);
 
         $this->upsertWidget('featured-products', 'Sản phẩm nổi bật', 'Product', $productIds, 'Xem chi tiết', 'Homepage featured product module section');
-        DB::table('widgets')->where('keyword', 'featured-products')->update(['short_code' => 'Xem thêm']);
+        DB::table('widgets')->where('keyword', 'featured-products')->update([
+            'short_code' => 'Xem thêm',
+            'note' => '#',
+        ]);
 
         $this->upsertWidget('home-designs-1', 'Tư vấn thiết kế', 'PostCatalogue', [$designConsultingCatalogueId], '6', 'Homepage design consulting tab');
         $this->upsertWidget('home-designs-2', 'Thiết kế karaoke', 'PostCatalogue', [$designKaraokeCatalogueId], '6', 'Homepage karaoke design tab');
+        DB::table('widgets')->whereIn('keyword', ['home-designs-1', 'home-designs-2'])->update([
+            'short_code' => 'Xem thêm',
+            'note' => '#',
+        ]);
 
         $this->upsertWidget('home-news-1', 'Tin tức KTV', 'PostCatalogue', [$newsCatalogueIds['news']], '7', 'Homepage news column');
         $this->upsertWidget('home-news-2', 'Kinh nghiệm thi công', 'PostCatalogue', [$newsCatalogueIds['experience']], '7', 'Homepage experience column');
@@ -132,6 +141,8 @@ class KaraokeHomepageSeeder extends Seeder
             ]);
 
         $aboutText = 'Chúng tôi cung cấp giải pháp thiết kế và thi công phòng karaoke trọn gói, từ tư vấn ý tưởng, thiết kế concept 3D đến thi công nội thất và lắp đặt hệ thống âm thanh - ánh sáng hoàn chỉnh. Với kinh nghiệm thực hiện hàng trăm phòng karaoke trên toàn quốc, đội ngũ của chúng tôi hiểu rõ cách tạo nên một không gian giải trí vừa đẹp, vừa hiệu quả trong vận hành kinh doanh.';
+        $this->seedIntroduce($aboutText);
+
         $this->upsertWidget('about-hero', 'Giới thiệu', 'Post', [], '', 'About hero section');
         DB::table('widgets')->where('keyword', 'about-hero')->update([
             'album' => json_encode(['/userfiles/image/bg-about-hero.png'], JSON_UNESCAPED_UNICODE),
@@ -194,6 +205,88 @@ class KaraokeHomepageSeeder extends Seeder
         $this->updatePostPresentation($aboutStatIds[3], '500+', '');
         $this->upsertWidget('about-stats', 'Số liệu giới thiệu', 'Post', $aboutStatIds, '', 'About intro statistic records');
 
+        $this->fillPostCanonicals(collect([706, 704, 703, 702, 701, 700, 699, 698])
+            ->merge($designPostIds)
+            ->merge(collect($newsPostIds)->flatten())
+            ->merge($aboutFeatureIds)
+            ->merge($serviceIds)
+            ->merge($introActionIds)
+            ->merge($aboutStatIds)
+            ->all());
+
+        DB::table('widgets')
+            ->whereIn('keyword', [
+                'intro',
+                'intro-features',
+                'intro-services',
+                'intro-action',
+                'about-hero',
+                'about-intro',
+                'about-intro-features',
+                'about-stats',
+                'about-services',
+            ])
+            ->update([
+                'deleted_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+    }
+
+    private function seedIntroduce(string $aboutText): void
+    {
+        $items = [
+            'block_1_company' => 'AZKTV Việt Nam',
+            'block_1_en' => 'Chuyên gia thiết kế phòng karaoke',
+            'block_1_description' => $aboutText,
+            'block_1_image' => '/userfiles/image/bg-about-hero.png',
+            'block_1_button_label' => 'Xem thêm',
+            'block_1_button_link' => '#',
+            'block_2_content' => $aboutText,
+            'block_2_box_1_number' => '10+',
+            'block_2_box_1_text' => 'Năm kinh nghiệm',
+            'block_2_box_2_number' => '34+',
+            'block_2_box_2_text' => 'Tỉnh thành',
+            'block_2_box_3_number' => '10+',
+            'block_2_box_3_text' => 'Quốc gia',
+            'block_2_box_4_number' => '500+',
+            'block_2_box_4_text' => 'Dự án hoàn thành',
+            'block_3_image_1' => '/uploads/images/thiet-ke/thiet-ke-phong-khach-01.jpg',
+            'block_3_image_2' => '/uploads/images/thiet-ke/thiet-ke-phong-giam-doc-01.jpg',
+            'block_4_image' => '/userfiles/image/home/about-banner.png',
+            'block_4_heading' => 'Thiết kế karaoke trọn gói',
+            'block_8_heading' => 'Dịch vụ của chúng tôi',
+            'block_8_description' => $aboutText,
+            'block_8_image' => '/userfiles/image/home/karaoke-section-bg.png',
+            'block_8_block_1_title' => 'Thiết kế 3D',
+            'block_8_block_1_description' => 'Lên concept 3D rõ ràng để chốt phương án trước khi thi công.',
+            'block_8_block_2_title' => 'Thi công cách âm',
+            'block_8_block_2_description' => 'Xử lý cách âm đúng kỹ thuật cho phòng hát vận hành ổn định.',
+            'block_8_block_3_title' => 'Lắp đặt âm thanh',
+            'block_8_block_3_description' => 'Tư vấn và lắp đặt hệ thống âm thanh phù hợp mô hình sử dụng.',
+            'block_8_block_4_title' => 'Ánh sáng & nội thất',
+            'block_8_block_4_description' => 'Hoàn thiện ánh sáng, nội thất và điểm nhấn nhận diện phòng hát.',
+            'block_9_block_1_title' => 'Kinh nghiệm thực tế',
+            'block_9_block_1_description' => 'Đội ngũ đã triển khai nhiều mô hình phòng karaoke thực tế.',
+            'block_9_block_2_title' => 'Thi công chuẩn kỹ thuật',
+            'block_9_block_2_description' => 'Quy trình thi công bám sát tiêu chuẩn âm học và vận hành.',
+            'block_9_block_3_title' => 'Thiết kế sáng tạo',
+            'block_9_block_3_description' => 'Concept thiết kế riêng theo mô hình kinh doanh và ngân sách.',
+            'block_9_block_4_title' => 'Chi phí tối ưu',
+            'block_9_block_4_description' => 'Tối ưu vật liệu, thiết bị và ngân sách đầu tư thực tế.',
+        ];
+
+        foreach ($items as $keyword => $content) {
+            DB::table('introduces')->updateOrInsert(
+                ['keyword' => $keyword, 'language_id' => $this->languageId],
+                [
+                    'content' => $content,
+                    'user_id' => $this->userId,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
     }
 
     private function seedPosts(array $items): array
@@ -240,21 +333,76 @@ class KaraokeHomepageSeeder extends Seeder
             $postId = DB::table('posts')->insertGetId($payload);
         }
 
+        $languagePayload = [
+            'name' => $name,
+            'description' => $description,
+            'content' => $description,
+            'meta_title' => $name,
+            'meta_keyword' => $name,
+            'meta_description' => $description,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+
+        if (Schema::hasColumn('post_language', 'canonical')) {
+            $currentCanonical = DB::table('post_language')
+                ->where('post_id', $postId)
+                ->where('language_id', $this->languageId)
+                ->value('canonical');
+
+            $languagePayload['canonical'] = $currentCanonical ?: $this->canonicalFromName($name, $postId);
+        }
+
         DB::table('post_language')->updateOrInsert(
             ['post_id' => $postId, 'language_id' => $this->languageId],
-            [
-                'name' => $name,
-                'description' => $description,
-                'content' => $description,
-                'meta_title' => $name,
-                'meta_keyword' => $name,
-                'meta_description' => $description,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]
+            $languagePayload
         );
 
         return (int) $postId;
+    }
+
+    private function fillPostCanonicals(array $postIds): void
+    {
+        if (!Schema::hasColumn('post_language', 'canonical')) {
+            return;
+        }
+
+        $postIds = collect($postIds)
+            ->flatten()
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($postIds->isEmpty()) {
+            return;
+        }
+
+        $rows = DB::table('post_language')
+            ->where('language_id', $this->languageId)
+            ->whereIn('post_id', $postIds)
+            ->where(function ($query) {
+                $query->whereNull('canonical')->orWhere('canonical', '');
+            })
+            ->get(['post_id', 'name']);
+
+        foreach ($rows as $row) {
+            DB::table('post_language')
+                ->where('post_id', $row->post_id)
+                ->where('language_id', $this->languageId)
+                ->update([
+                    'canonical' => $this->canonicalFromName((string) $row->name, (int) $row->post_id),
+                    'updated_at' => now(),
+                ]);
+        }
+    }
+
+    private function canonicalFromName(string $name, int $id): string
+    {
+        $canonical = Str::slug($name);
+
+        return $canonical !== '' ? "{$canonical}-{$id}" : "post-{$id}";
     }
 
     private function upsertProduct(string $canonical, string $name, string $description, string $image, int $order): int

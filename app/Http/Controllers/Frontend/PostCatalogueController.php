@@ -74,12 +74,6 @@ class PostCatalogueController extends FrontendController
             ['keyword' => 'product-category', 'children' => true],
             ['keyword' => 'product-category-highlight', 'object' => true],
             ['keyword' => 'about-us-2'],
-            ['keyword' => 'intro'],
-            ['keyword' => 'about-hero'],
-            ['keyword' => 'about-intro'],
-            ['keyword' => 'about-intro-features', 'object' => true],
-            ['keyword' => 'about-stats', 'object' => true],
-            ['keyword' => 'about-services', 'object' => true],
             ['keyword' => 'karaoke-construction', 'object' => true],
         ], $this->language);
 

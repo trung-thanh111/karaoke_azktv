@@ -10,6 +10,7 @@ use App\Enums\SlideEnum;
 use App\Services\V1\Core\WidgetService;
 use Illuminate\Http\Request;
 use App\Support\LegacyFrontend;
+use App\Models\Introduce;
 use Jenssegers\Agent\Facades\Agent;
 
 class HomeController extends FrontendController
@@ -45,10 +46,6 @@ class HomeController extends FrontendController
         );
 
         $widgets = $this->widgetService->getWidget([
-            ['keyword' => 'intro'],
-            ['keyword' => 'intro-features', 'object' => true],
-            ['keyword' => 'intro-services', 'object' => true],
-            ['keyword' => 'intro-action', 'object' => true],
             ['keyword' => 'home-designs-1', 'object' => true, 'limit' => 30],
             ['keyword' => 'home-designs-2', 'object' => true, 'limit' => 30],
             ['keyword' => 'home-news-1', 'object' => true, 'limit' => 30],
@@ -67,6 +64,7 @@ class HomeController extends FrontendController
 
 
         $system = $this->system;
+        $introduce = convert_array(Introduce::where('language_id', $this->language)->get(), 'keyword', 'content');
         $seo = [
             'meta_title' => $this->system['seo_meta_title'] ?? $this->system['homepage_company'] ?? config('app.name'),
             'meta_keyword' => $this->system['seo_meta_keyword'] ?? '',
@@ -84,6 +82,7 @@ class HomeController extends FrontendController
             'system',
             'schema',
             'widgets',
+            'introduce',
         ) + $legacy);
     }
 

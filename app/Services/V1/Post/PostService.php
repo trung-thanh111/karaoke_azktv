@@ -178,6 +178,10 @@ class PostService extends BaseService
             }
         }
 
+        if (!SchemaCache::hasColumn('posts', 'follow')) {
+            unset($payload['follow']);
+        }
+
         return $payload;
     }
 
@@ -193,7 +197,13 @@ class PostService extends BaseService
     }
 
     private function formatLanguagePayload($payload, $postId, $languageId){
-        $payload['canonical'] = Str::slug($payload['canonical']);
+        if (array_key_exists('canonical', $payload)) {
+            if (!SchemaCache::hasColumn('post_language', 'canonical')) {
+                unset($payload['canonical']);
+            } else {
+                $payload['canonical'] = Str::slug($payload['canonical']);
+            }
+        }
         $payload['language_id'] =  $languageId;
         $payload['post_id'] = $postId;
         return $payload;
