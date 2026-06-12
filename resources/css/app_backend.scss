@@ -12,6 +12,38 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, p, span, a, input, button, select, textarea, th, td {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+p,
+a,
+input,
+button,
+select,
+textarea,
+th,
+td {
     font-family: 'Inter', sans-serif !important;
+}
+
+.fa {
+    font-family: 'FontAwesome' !important;
+}
+
+.metismenu .fa.arrow:before {
+    content: "\f105" !important;
+}
+
+.metismenu .active>a>.fa.arrow:before {
+    content: "\f107" !important;
 }
