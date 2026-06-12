@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use App\Traits\QueryScopes;
+use App\Support\SchemaCache;
 
 class Post extends Model
 {
@@ -54,7 +55,7 @@ class Post extends Model
             'content',
         ];
 
-        if (\Illuminate\Support\Facades\Schema::hasColumn('post_language', 'canonical')) {
+        if (SchemaCache::hasColumn('post_language', 'canonical')) {
             $pivot[] = 'canonical';
         }
 

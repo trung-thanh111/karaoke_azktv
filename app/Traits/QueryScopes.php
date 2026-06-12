@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Support\SchemaCache;
+
 trait QueryScopes
 {
     public function scopeKeyword($query, $keyword, $fieldSearch = [], $whereHas = []){
@@ -27,7 +29,7 @@ trait QueryScopes
     public function scopePublish($query, $publish){
         if(!empty($publish) ){
             $table = $query->getModel()->getTable();
-            $column = \Illuminate\Support\Facades\Schema::hasColumn($table, 'publish') ? 'publish' : 'pubish';
+            $column = SchemaCache::hasColumn($table, 'publish') ? 'publish' : 'pubish';
             $query->where($table.'.'.$column, '=', $publish);
         }
         return $query;
@@ -38,10 +40,10 @@ trait QueryScopes
             foreach($where as $key => $val){
                 $table = $query->getModel()->getTable();
                 $column = $val[0];
-                if($column === 'publish' && !\Illuminate\Support\Facades\Schema::hasColumn($table, 'publish') && \Illuminate\Support\Facades\Schema::hasColumn($table, 'pubish')){
+                if($column === 'publish' && !SchemaCache::hasColumn($table, 'publish') && SchemaCache::hasColumn($table, 'pubish')){
                     $column = 'pubish';
                 }
-                if($column === 'parent_id' && !\Illuminate\Support\Facades\Schema::hasColumn($table, 'parent_id') && \Illuminate\Support\Facades\Schema::hasColumn($table, 'parentid')){
+                if($column === 'parent_id' && !SchemaCache::hasColumn($table, 'parent_id') && SchemaCache::hasColumn($table, 'parentid')){
                     $column = 'parentid';
                 }
                 $query->where($column, $val[1], $val[2]);

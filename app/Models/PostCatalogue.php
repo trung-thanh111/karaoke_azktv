@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use App\Traits\QueryScopes;
+use App\Support\SchemaCache;
 
 class PostCatalogue extends Model
 {
@@ -74,7 +75,7 @@ class PostCatalogue extends Model
     
 
     public function direct_children(){
-        $parentColumn = \Illuminate\Support\Facades\Schema::hasColumn('post_catalogues', 'parent_id') ? 'parent_id' : 'parentid';
+        $parentColumn = SchemaCache::hasColumn('post_catalogues', 'parent_id') ? 'parent_id' : 'parentid';
         return $this->hasMany(PostCatalogue::class, $parentColumn, 'id');
     }
 

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use App\Traits\QueryScopes;
+use App\Support\SchemaCache;
 
 class ProductCatalogue extends Model
 {
@@ -48,7 +49,7 @@ class ProductCatalogue extends Model
             'content',
         ];
 
-        if (\Illuminate\Support\Facades\Schema::hasColumn('product_catalogue_language', 'url')) {
+        if (SchemaCache::hasColumn('product_catalogue_language', 'url')) {
             $pivot[] = 'url';
         }
 

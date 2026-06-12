@@ -8,6 +8,7 @@ use App\Repositories\BaseRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 /**
  * Class UserService
@@ -190,7 +191,7 @@ class ProductRepository extends BaseRepository
                 'tb2.canonical',
             ];
 
-        if (Schema::hasColumn('products', 'iframe')) {
+        if (SchemaCache::hasColumn('products', 'iframe')) {
             $columns[] = 'products.iframe';
         } else {
             $columns[] = DB::raw("'' as iframe");

@@ -6,6 +6,7 @@ use App\Models\PostCatalogue;
 use App\Repositories\BaseRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 
 /**
@@ -26,9 +27,9 @@ class PostCatalogueRepository extends BaseRepository
     
 
     public function getPostCatalogueById(int $id = 0, $language_id = 0){
-        $parentColumn = Schema::hasColumn('post_catalogues', 'parent_id') ? 'post_catalogues.parent_id' : 'post_catalogues.parentid';
-        $publishColumn = Schema::hasColumn('post_catalogues', 'publish') ? 'post_catalogues.publish' : 'post_catalogues.pubish';
-        $shortNameColumn = Schema::hasColumn('post_catalogues', 'short_name') ? 'post_catalogues.short_name' : "''";
+        $parentColumn = SchemaCache::hasColumn('post_catalogues', 'parent_id') ? 'post_catalogues.parent_id' : 'post_catalogues.parentid';
+        $publishColumn = SchemaCache::hasColumn('post_catalogues', 'publish') ? 'post_catalogues.publish' : 'post_catalogues.pubish';
+        $shortNameColumn = SchemaCache::hasColumn('post_catalogues', 'short_name') ? 'post_catalogues.short_name' : "''";
 
         return $this->model->select([
                 'post_catalogues.id',

@@ -3,8 +3,16 @@
     $hero = $slides[\App\Enums\SlideEnum::MAIN] ?? ($slides['index-slide'] ?? []);
     $heroItems = $hero['item'] ?? [];
     $heroSettings = $hero['setting'] ?? [];
-    $heroStats = $heroSettings['stats'] ?? [];
-    $heroActions = $heroSettings['actions'] ?? [];
+    $heroStats = !empty($heroSettings['stats']) ? $heroSettings['stats'] : [
+        ['value' => '10+', 'label' => 'Năm kinh nghiệm'],
+        ['value' => '34+', 'label' => 'Tỉnh thành'],
+        ['value' => '10+', 'label' => 'Quốc gia'],
+        ['value' => '500+', 'label' => 'Dự án hoàn thành'],
+    ];
+    $heroActions = !empty($heroSettings['actions']) ? $heroSettings['actions'] : [
+        ['label' => 'Nhận báo giá miễn phí', 'url' => '#'],
+        ['label' => 'Xem các mẫu phòng', 'url' => '#'],
+    ];
     $introWidget = $widgets['intro'] ?? null;
     $introDescription = $introWidget->description[$languageId] ?? ($introWidget->description['1'] ?? []);
     $introImages = $introWidget->album ?? [];

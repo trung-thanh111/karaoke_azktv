@@ -26,20 +26,22 @@
                 </td>
                 <td>
                     <div class="sortui ui-sortable table-slide clearfix">
-                        @foreach($slide->item[$config['language']] as $item)
-                        <li class="ui-state-default">
-                            <span class="image img-cover"><img src="{{ image($item['image'])  }}" alt=""></span>
-                            <div class="hidden">
-                                <input type="text" name="slide[id][]" value="{{ $slide->id }}">
-                                <input type="text" name="slide[name][]" value="{{ $item['name'] }}">
-                                <input type="text" name="slide[image][]" value="{{ $item['image'] }}">
-                                <input type="text" name="slide[alt][]" value="{{ $item['alt'] }}">
-                                <input type="text" name="slide[description][]" value="{{ $item['description'] }}">
-                                <input type="text" name="slide[canonical][]" value="{{ $item['canonical'] }}">
-                                <input type="text" name="slide[window][]" value="{{ $item['window'] }}">
-                            </div>
-                        </li>
-                        @endforeach
+                        @if(!empty($slide->item[$config['language']]))
+                            @foreach($slide->item[$config['language']] as $item)
+                            <li class="ui-state-default">
+                                <span class="image img-cover"><img src="{{ image($item['image'] ?? '')  }}" alt=""></span>
+                                <div class="hidden">
+                                    <input type="text" name="slide[id][]" value="{{ $slide->id }}">
+                                    <input type="text" name="slide[name][]" value="{{ $item['name'] ?? '' }}">
+                                    <input type="text" name="slide[image][]" value="{{ $item['image'] ?? '' }}">
+                                    <input type="text" name="slide[alt][]" value="{{ $item['alt'] ?? '' }}">
+                                    <input type="text" name="slide[description][]" value="{{ $item['description'] ?? '' }}">
+                                    <input type="text" name="slide[canonical][]" value="{{ $item['canonical'] ?? '' }}">
+                                    <input type="text" name="slide[window][]" value="{{ $item['window'] ?? '' }}">
+                                </div>
+                            </li>
+                            @endforeach
+                        @endif
                     </div>
                 </td>
                 

@@ -3,7 +3,6 @@
     $canonical = write_url($product->languages->canonical);
     $image = $product->image;
     // $price = getPrice($product);
-    $catName = $product->product_catalogues->first()->languages->name;
     // $review = $product->review_average;
 @endphp
 <div class="product-item">

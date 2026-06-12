@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use App\Support\SchemaCache;
 
 /**
  * Class WidgetService - Fixed Pure Query Builder Implementation
@@ -378,7 +379,7 @@ class WidgetService extends BaseService
         $languageTable = str_replace('_catalogues', '_catalogue_language', $tableName);
         $catalogueIdField = $this->getCatalogueIdField($tableName);
         $modelIdList = implode(',', array_map('intval', $modelIds));
-        $publishColumn = Schema::hasColumn($tableName, 'publish') ? 'publish' : 'pubish';
+        $publishColumn = SchemaCache::hasColumn($tableName, 'publish') ? 'publish' : 'pubish';
 
         $results = DB::select("
             SELECT 
@@ -440,8 +441,8 @@ class WidgetService extends BaseService
 
         $languageTable = str_replace('_catalogues', '_catalogue_language', $tableName);
         $catalogueIdField = $this->getCatalogueIdField($tableName);
-        $parentField = Schema::hasColumn($tableName, 'parent_id') ? 'parent_id' : 'parentid';
-        $publishColumn = Schema::hasColumn($tableName, 'publish') ? 'publish' : 'pubish';
+        $parentField = SchemaCache::hasColumn($tableName, 'parent_id') ? 'parent_id' : 'parentid';
+        $publishColumn = SchemaCache::hasColumn($tableName, 'publish') ? 'publish' : 'pubish';
         $parentIdList = implode(',', array_map('intval', $needsChildren));
 
         $results = DB::select("
@@ -508,8 +509,8 @@ class WidgetService extends BaseService
         $objectCatalogueTable = $this->getTableName($catalogueModel);
         $objectCatalogueLanguageTable = str_replace('_catalogues', '_catalogue_language', $objectCatalogueTable);
         $categoryIdList = implode(',', array_map('intval', $allCategoryIds));
-        $objectPublishColumn = Schema::hasColumn($objectTable, 'publish') ? 'publish' : 'pubish';
-        $objectCanonicalSelect = Schema::hasColumn($objectLanguageTable, 'canonical') ? 'ol.canonical' : 'NULL as canonical';
+        $objectPublishColumn = SchemaCache::hasColumn($objectTable, 'publish') ? 'publish' : 'pubish';
+        $objectCanonicalSelect = SchemaCache::hasColumn($objectLanguageTable, 'canonical') ? 'ol.canonical' : 'NULL as canonical';
 
         // --- FULL SQL ---
         $sql = "
@@ -676,8 +677,8 @@ class WidgetService extends BaseService
         $catalogueLanguageTable = Str::snake($model) . '_catalogue_language';
         $pivotTable = Str::snake($model) . '_catalogue_' . Str::snake($model);
         $modelIdList = implode(',', array_map('intval', $modelIds));
-        $publishColumn = Schema::hasColumn($tableName, 'publish') ? 'publish' : 'pubish';
-        $canonicalSelect = Schema::hasColumn($languageTable, 'canonical') ? 'ol.canonical' : 'NULL as canonical';
+        $publishColumn = SchemaCache::hasColumn($tableName, 'publish') ? 'publish' : 'pubish';
+        $canonicalSelect = SchemaCache::hasColumn($languageTable, 'canonical') ? 'ol.canonical' : 'NULL as canonical';
 
 
         $sql = "
@@ -798,11 +799,20 @@ class WidgetService extends BaseService
      */
     private function collectChildrenIds(string $tableName, int $parentId, array &$ids): void
     {
-        $parentField = Schema::hasColumn($tableName, 'parent_id') ? 'parent_id' : 'parentid';
-        $children = DB::select("
-            SELECT id FROM {$tableName} 
-            WHERE {$parentField} = ? AND deleted_at IS NULL
-        ", [$parentId]);
+        static $childrenMapCache = [];
+
+        $parentField = SchemaCache::hasColumn($tableName, 'parent_id') ? 'parent_id' : 'parentid';
+        $cacheKey = "{$tableName}.{$parentField}";
+
+        if (!isset($childrenMapCache[$cacheKey])) {
+            $childrenMapCache[$cacheKey] = collect(DB::select("
+                SELECT id, {$parentField} as parent_id
+                FROM {$tableName}
+                WHERE deleted_at IS NULL
+            "))->groupBy('parent_id');
+        }
+
+        $children = $childrenMapCache[$cacheKey]->get($parentId, collect());
 
         foreach ($children as $child) {
             if (!in_array($child->id, $ids)) {

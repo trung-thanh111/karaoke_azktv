@@ -11,6 +11,7 @@ use App\Http\ViewComposers\MenuComposer;
 use App\Http\ViewComposers\CartComposer;
 use App\Http\ViewComposers\CustomerComposer;
 use App\Models\Language;
+use App\Support\SchemaCache;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -68,9 +69,15 @@ class AppServiceProvider extends ServiceProvider
         });
 
         view()->composer(['frontend.*', 'mobile.*'], function($view) {
-            if (Schema::hasTable('languages')) {
+            static $languageByLocale = [];
+
+            if (SchemaCache::hasTable('languages')) {
                 $locale = app()->getLocale(); // vn en cn
-                $language = Language::where('canonical', $locale)->first();
+                if (!array_key_exists($locale, $languageByLocale)) {
+                    $languageByLocale[$locale] = Language::where('canonical', $locale)->first();
+                }
+
+                $language = $languageByLocale[$locale];
 
                 if ($language) {
                     $composerClasses = [

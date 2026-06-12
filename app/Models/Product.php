@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use App\Traits\QueryScopes;
+use App\Support\SchemaCache;
 
 class Product extends Model
 {
@@ -62,7 +63,7 @@ class Product extends Model
             'content',
         ];
 
-        if (\Illuminate\Support\Facades\Schema::hasColumn('product_language', 'url')) {
+        if (SchemaCache::hasColumn('product_language', 'url')) {
             $pivot[] = 'url';
         }
 
@@ -73,7 +74,8 @@ class Product extends Model
 
     public function product_catalogues()
     {
-        return $this->belongsToMany(ProductCatalogue::class, 'product_catalogue_product', 'product_id', 'product_catalogue_id');
+        return $this->belongsToMany(ProductCatalogue::class, 'product_catalogue_product', 'product_id', 'product_catalogue_id')
+            ->with('languages');
     }
 
     public function product_variants()

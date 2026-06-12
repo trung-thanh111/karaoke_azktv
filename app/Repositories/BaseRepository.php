@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Base;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 /**
  * Class BaseService
@@ -282,10 +283,10 @@ class BaseRepository
     private function normalizeColumn(string $column): string
     {
         $table = $this->model->getTable();
-        if ($column === 'publish' && !Schema::hasColumn($table, 'publish') && Schema::hasColumn($table, 'pubish')) {
+        if ($column === 'publish' && !SchemaCache::hasColumn($table, 'publish') && SchemaCache::hasColumn($table, 'pubish')) {
             return 'pubish';
         }
-        if ($column === 'parent_id' && !Schema::hasColumn($table, 'parent_id') && Schema::hasColumn($table, 'parentid')) {
+        if ($column === 'parent_id' && !SchemaCache::hasColumn($table, 'parent_id') && SchemaCache::hasColumn($table, 'parentid')) {
             return 'parentid';
         }
         return $column;

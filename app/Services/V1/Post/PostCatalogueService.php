@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use App\Classes\Nestedsetbie;
 use Illuminate\Support\Str;
+use App\Support\SchemaCache;
 
 /**
  * Class PostCatalogueService
@@ -169,21 +170,21 @@ class PostCatalogueService extends BaseService
 
     private function normalizeCataloguePayload(array $payload): array
     {
-        if (!Schema::hasColumn('post_catalogues', 'publish') && Schema::hasColumn('post_catalogues', 'pubish')) {
+        if (!SchemaCache::hasColumn('post_catalogues', 'publish') && SchemaCache::hasColumn('post_catalogues', 'pubish')) {
             if (array_key_exists('publish', $payload)) {
                 $payload['pubish'] = $payload['publish'];
                 unset($payload['publish']);
             }
         }
 
-        if (!Schema::hasColumn('post_catalogues', 'parent_id') && Schema::hasColumn('post_catalogues', 'parentid')) {
+        if (!SchemaCache::hasColumn('post_catalogues', 'parent_id') && SchemaCache::hasColumn('post_catalogues', 'parentid')) {
             if (array_key_exists('parent_id', $payload)) {
                 $payload['parentid'] = $payload['parent_id'];
                 unset($payload['parent_id']);
             }
         }
 
-        if (!Schema::hasColumn('post_catalogues', 'short_name')) {
+        if (!SchemaCache::hasColumn('post_catalogues', 'short_name')) {
             unset($payload['short_name']);
         }
 
@@ -207,7 +208,7 @@ class PostCatalogueService extends BaseService
 
 
     private function paginateSelect(){
-        $publishColumn = Schema::hasColumn('post_catalogues', 'publish')
+        $publishColumn = SchemaCache::hasColumn('post_catalogues', 'publish')
             ? 'post_catalogues.publish'
             : 'post_catalogues.pubish';
 

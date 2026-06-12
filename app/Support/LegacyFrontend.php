@@ -8,6 +8,7 @@ use App\Models\PostCatalogue;
 use App\Models\Product;
 use App\Models\ProductCatalogue;
 use App\Models\Slide;
+use App\Support\SchemaCache;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
@@ -67,6 +68,13 @@ class LegacyFrontend
 
     public static function navigations(string $position, int $language = 1): array
     {
+        static $cache = [];
+
+        $cacheKey = "{$position}.{$language}";
+        if (array_key_exists($cacheKey, $cache)) {
+            return $cache[$cacheKey];
+        }
+
         $keywords = array_values(array_unique([
             $position,
             $position . '-menu',
@@ -86,10 +94,10 @@ class LegacyFrontend
             ->first();
 
         if (!$catalogue) {
-            return [];
+            return $cache[$cacheKey] = [];
         }
 
-        return self::menuTree($catalogue->menus);
+        return $cache[$cacheKey] = self::menuTree($catalogue->menus);
     }
 
     public static function slides(array $keywords = ['index-slide'], int $language = 1): array
@@ -455,13 +463,13 @@ class LegacyFrontend
 
         return [
             'id' => $product->id,
-            'title' => $product->name ?? self::pivotValue($product, 'name'),
-            'slug' => $product->canonical ?? self::pivotValue($product, 'canonical'),
-            'canonical' => $product->canonical ?? self::pivotValue($product, 'canonical'),
+            'title' => self::translatedValue($product, 'name'),
+            'slug' => self::translatedValue($product, 'canonical'),
+            'canonical' => self::translatedValue($product, 'canonical'),
             'images' => self::image($product->image ?? null),
             'image' => self::image($product->image ?? null),
-            'description' => $product->description ?? self::pivotValue($product, 'description'),
-            'content' => $product->content ?? self::pivotValue($product, 'content'),
+            'description' => self::translatedValue($product, 'description'),
+            'content' => self::translatedValue($product, 'content'),
             'created' => optional($product->created_at)->format('d/m/Y') ?: '',
             'price' => (float) ($product->price ?? 0),
             'saleoff' => (float) ($product->promotion_price ?? $product->combo_price ?? 0),
@@ -479,7 +487,7 @@ class LegacyFrontend
             return [];
         }
 
-        $canonical = $post->canonical ?? self::pivotValue($post, 'canonical');
+        $canonical = self::translatedValue($post, 'canonical');
         if (empty($canonical) && !empty($post->id)) {
             static $routerCache = [];
             $routerCache[$post->id] ??= DB::table('routers')
@@ -491,13 +499,13 @@ class LegacyFrontend
 
         return [
             'id' => $post->id,
-            'title' => $post->name ?? self::pivotValue($post, 'name'),
+            'title' => self::translatedValue($post, 'name'),
             'slug' => $canonical,
             'canonical' => $canonical,
             'images' => self::image($post->image ?? null),
             'image' => self::image($post->image ?? null),
-            'description' => $post->description ?? self::pivotValue($post, 'description'),
-            'content' => $post->content ?? self::pivotValue($post, 'content'),
+            'description' => self::translatedValue($post, 'description'),
+            'content' => self::translatedValue($post, 'content'),
             'created' => optional($post->created_at)->format('d/m/Y') ?: '',
             'viewed' => $post->viewed ?? 0,
         ];
@@ -521,13 +529,13 @@ class LegacyFrontend
 
         return [
             'id' => $catalogue->id,
-            'title' => $catalogue->name ?? self::pivotValue($catalogue, 'name'),
-            'slug' => $catalogue->canonical ?? self::pivotValue($catalogue, 'canonical'),
-            'canonical' => $catalogue->canonical ?? self::pivotValue($catalogue, 'canonical'),
+            'title' => self::translatedValue($catalogue, 'name'),
+            'slug' => self::translatedValue($catalogue, 'canonical'),
+            'canonical' => self::translatedValue($catalogue, 'canonical'),
             'images' => self::image($catalogue->image ?? null),
             'image' => self::image($catalogue->image ?? null),
-            'description' => $catalogue->description ?? self::pivotValue($catalogue, 'description'),
-            'content' => $catalogue->content ?? self::pivotValue($catalogue, 'content'),
+            'description' => self::translatedValue($catalogue, 'description'),
+            'content' => self::translatedValue($catalogue, 'content'),
             'banner' => '',
             'banner_2' => '',
             'banner_3' => '',
@@ -540,6 +548,19 @@ class LegacyFrontend
         $language = $model?->languages?->first();
 
         return $language?->pivot?->{$field};
+    }
+
+    private static function translatedValue($model, string $field): ?string
+    {
+        if (!$model) {
+            return null;
+        }
+
+        if (method_exists($model, 'getAttributes') && array_key_exists($field, $model->getAttributes())) {
+            return $model->getAttribute($field);
+        }
+
+        return self::pivotValue($model, $field);
     }
 
     private static function productsQuery(int $language)
@@ -566,7 +587,7 @@ class LegacyFrontend
         $publishField = self::columnExists('posts', 'publish') ? 'publish' : 'pubish';
         $canonicalColumn = self::columnExists('post_language', 'canonical')
             ? 'post_language.canonical'
-            : DB::raw("'' as canonical");
+            : DB::raw("(select canonical from routers where routers.module_id = posts.id and routers.controllers like '%PostController%' limit 1) as canonical");
 
         return Post::query()
             ->select([
@@ -614,7 +635,13 @@ class LegacyFrontend
     private static function productChildren(int $parentId, int $language, int $limit): array
     {
         return ProductCatalogue::query()
-            ->select(['product_catalogues.*', 'product_catalogue_language.name', 'product_catalogue_language.canonical', 'product_catalogue_language.description'])
+            ->select([
+                'product_catalogues.*',
+                'product_catalogue_language.name',
+                'product_catalogue_language.canonical',
+                'product_catalogue_language.description',
+                'product_catalogue_language.content',
+            ])
             ->join('product_catalogue_language', 'product_catalogue_language.product_catalogue_id', '=', 'product_catalogues.id')
             ->where('product_catalogue_language.language_id', $language)
             ->where('product_catalogues.parent_id', $parentId)
@@ -634,7 +661,13 @@ class LegacyFrontend
         $publishField = self::columnExists('post_catalogues', 'publish') ? 'publish' : 'pubish';
 
         return PostCatalogue::query()
-            ->select(['post_catalogues.*', 'post_catalogue_language.name', 'post_catalogue_language.canonical', 'post_catalogue_language.description'])
+            ->select([
+                'post_catalogues.*',
+                'post_catalogue_language.name',
+                'post_catalogue_language.canonical',
+                'post_catalogue_language.description',
+                'post_catalogue_language.content',
+            ])
             ->join('post_catalogue_language', 'post_catalogue_language.post_catalogue_id', '=', 'post_catalogues.id')
             ->where('post_catalogue_language.language_id', $language)
             ->where("post_catalogues.{$parentField}", $parentId)
@@ -685,7 +718,7 @@ class LegacyFrontend
         $key = "{$table}.{$column}";
 
         if (!array_key_exists($key, $cache)) {
-            $cache[$key] = DB::getSchemaBuilder()->hasColumn($table, $column);
+            $cache[$key] = SchemaCache::hasColumn($table, $column);
         }
 
         return $cache[$key];
@@ -693,7 +726,7 @@ class LegacyFrontend
 
     private static function legacyArchiveRows(string $sourceTable): array
     {
-        if (!DB::getSchemaBuilder()->hasTable('legacy_import_records')) {
+        if (!SchemaCache::hasTable('legacy_import_records')) {
             return [];
         }
 

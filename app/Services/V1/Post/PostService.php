@@ -11,6 +11,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 /**
  * Class PostService
@@ -170,7 +171,7 @@ class PostService extends BaseService
 
     private function normalizePostPayload(array $payload): array
     {
-        if (!Schema::hasColumn('posts', 'publish') && Schema::hasColumn('posts', 'pubish')) {
+        if (!SchemaCache::hasColumn('posts', 'publish') && SchemaCache::hasColumn('posts', 'pubish')) {
             if (array_key_exists('publish', $payload)) {
                 $payload['pubish'] = $payload['publish'];
                 unset($payload['publish']);
@@ -228,7 +229,7 @@ class PostService extends BaseService
     }
 
     private function paginateColumns(){
-        $publishColumn = Schema::hasColumn('posts', 'publish') ? 'posts.publish' : 'posts.pubish';
+        $publishColumn = SchemaCache::hasColumn('posts', 'publish') ? 'posts.publish' : 'posts.pubish';
         $columns = [
             'posts.id',
             $publishColumn,
@@ -244,7 +245,7 @@ class PostService extends BaseService
             'tb2.description',
         ];
 
-        if (Schema::hasColumn('post_language', 'canonical')) {
+        if (SchemaCache::hasColumn('post_language', 'canonical')) {
             $columns[] = 'tb2.canonical';
         }
 

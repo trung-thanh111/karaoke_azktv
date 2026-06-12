@@ -7,6 +7,7 @@ use App\Repositories\Interfaces\PostRepositoryInterface;
 use App\Repositories\BaseRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Support\SchemaCache;
 
 /**
  * Class UserService
@@ -26,8 +27,8 @@ class PostRepository extends BaseRepository
     
 
     public function getPostById(int $id = 0, $language_id = 0){
-        $publishColumn = Schema::hasColumn('posts', 'publish') ? 'posts.publish' : 'posts.pubish';
-        $canonicalSelect = Schema::hasColumn('post_language', 'canonical') ? 'tb2.canonical' : DB::raw("'' as canonical");
+        $publishColumn = SchemaCache::hasColumn('posts', 'publish') ? 'posts.publish' : 'posts.pubish';
+        $canonicalSelect = SchemaCache::hasColumn('post_language', 'canonical') ? 'tb2.canonical' : DB::raw("'' as canonical");
 
         return $this->model->select([
                 'posts.id',
